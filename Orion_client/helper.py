@@ -6,6 +6,7 @@ import math
 
 class Helper(object):
     def getAngledPoint(angle, longueur, cx, cy):
+        """Additione un vecteur de longueur et d'angle à un point de coordonnées cx, cy"""
         x = (math.cos(angle) * longueur) + cx
         y = (math.sin(angle) * longueur) + cy
         return (x, y)

@@ -2,6 +2,8 @@
 ##  version 2022 14 mars - jmd
 ##  version  janvier 2023
 #     enlever import inutile
+from typing import Any, Literal
+
 import json
 import urllib.error
 import urllib.parse
@@ -12,51 +14,109 @@ from orion_vue import *
 
 
 class Controleur():
+    """Controlleur du jeu Orion, qui gère les interactions entre le modèle et la vue
+    
+    Attributes
+    -----------
+    mon_nom: :class:`str`
+        Nom de joueur, sert d'identifiant dans le jeu.
+    joueur_createur: :class:`int`
+        1 quand un joueur "Créer une partie", peut Demarrer la partie.
+    cadrejeu: :class:`int`
+        Compte les tours dans la boucle de jeu.
+    actionsrequises: :class:`list`[:class:`tuple`[:class:`str`, :class:`str`, :class:`tuple`]]
+        Les actions envoyées au serveur.
+    joueurs: :class:`list`[:class:`str`]
+        Specifies if the user is a system user (i.e. represents Discord officially).
+        .. versionadded:: 1.3
+    prochainsplash: Optional[:class:`str`]
+        Requis pour sortir de cette boucle et passer au lobby du jeu.
+    onjoue: :class:`int`
+        Indicateur que le jeu se poursuive - sinon on attend qu'un autre joueur nous rattrape.
+    maindelai: :class:`int`
+        Delai en ms de la boucle de jeu.
+    moduloappeler_serveur: :class:`int`
+        Frequence des appel au serveur, evite de passer son temps a communiquer avec le serveur.
+    urlserveur: :class:`str`
+        URL du serveur.
+    modele: :class:`Modele`
+        La variable contenant la partie, après :meth:`~initialiserpartie`.
+    vue: :class:`Vue`
+        La vue pour l'affichage et les controles du jeu.
+    """
     def __init__(self):
-        self.mon_nom = self.generer_nom()  # nom de joueur, sert d'identifiant dans le jeu - ici, avec auto-generation
-        self.joueur_createur = 0  # 1 quand un joueur "Créer une partie", peut Demarrer la partie
-        self.cadrejeu = 0  # compte les tours dans la boucle de jeu (bouclersurjeu)
-        self.actionsrequises = []  # les actions envoyées au serveur
-        self.joueurs = []  # liste des noms de joueurs pour le lobby
+        self.mon_nom: str = self.generer_nom()
+        """Nom de joueur, sert d'identifiant dans le jeu"""
+        # ici, avec auto-generation
+        self.joueur_createur: int = 0
+        """1 quand un joueur "Créer une partie", peut Démarrer la partie"""
+        self.cadrejeu: int = 0
+        """Compte les tours dans la boucle de jeu (bouclersurjeu)"""
+        self.actionsrequises: list[tuple[str, str, tuple[Any]]] = []
+        """Les actions envoyées au serveur"""
+        self.joueurs: list = []  # TODO: Find list type
+        """Liste des noms de joueurs pour le lobby"""
 
-        self.prochainsplash = None  # requis pour sortir de cette boucle et passer au lobby du jeu
-        self.onjoue = 1  # indicateur que le jeu se poursuive - sinon on attend qu'un autre joueur nous rattrape
-        self.maindelai = 50  # delai en ms de la boucle de jeu
-        self.moduloappeler_serveur = 2  # frequence des appel au serveur, evite de passer son temps a communiquer avec le serveur
-        self.urlserveur = "http://127.0.0.1:8000"  # 127.0.0.1 pour tests,"http://votreidentifiant.pythonanywhere.com" pour web
+        self.prochainsplash: bool | None = None  # TODO: Verify validity
+        """Requis pour sortir de cette boucle et passer au lobby du jeu"""
+        self.onjoue: int = 1
+        """Indicateur que le jeu se poursuive - sinon on attend qu'un 
+        autre joueur nous rattrape
+        """
+        self.maindelai: int = 50
+        """Délai en ms de la boucle de jeu"""
+        self.moduloappeler_serveur: int = 2
+        """Fréquence des appel au serveur, évite de passer son temps à
+        communiquer avec le serveur
+        """
+        # 127.0.0.1 pour tests,"http://votreidentifiant.pythonanywhere.com" pour web
+        self.urlserveur: str = "http://127.0.0.1:8000"
+        
         # self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
-        self.modele = None  # la variable contenant la partie, après initialiserpartie()
-        self.vue = Vue(self, self.urlserveur, self.mon_nom,
-                       "Non connecté")  # la vue pour l'affichage et les controles du jeu
+        self.modele: Modele | None = None
+        """La variable contenant la partie, après initialiserpartie()"""
+        self.vue: Vue = Vue(
+                self, self.urlserveur, self.mon_nom, "Non connecté"
+        )
+        """La vue pour l'affichage et les controles du jeu"""
 
-        self.vue.root.mainloop()  # la boucle des evenements (souris, click, clavier)
+        self.vue.root.mainloop()
+        """La boucle des événements (souris, clavier, etc.)"""
 
-    ######################################################################################################
-    ### FONCTIONS RESERVEES - INTERDICTION DE MODIFIER SANS AUTORISATION PREALABLE SAUF CHOIX DE RANDOM SEED LIGNE 94-95
-    def connecter_serveur(self, url_serveur):
-        self.urlserveur = url_serveur  # le dernier avant le clic
+    ##################################################################
+    # FONCTIONS RESERVEES - INTERDICTION DE MODIFIER SANS AUTORISATION
+    # PREALABLE SAUF CHOIX DE RANDOM SEED LIGNE 94-95
+    def connecter_serveur(self, url_serveur: str) -> None:
+        self.urlserveur = url_serveur
+        """Le dernier avant le clic"""
         self.boucler_sur_splash()
 
     # a partir du splash
-    def creer_partie(self, nom):
-        if self.prochainsplash:  # si on est dans boucler_sur_splash, on doit supprimer le prochain appel
+    def creer_partie(self, nom: str) -> None:
+        if self.prochainsplash:
+            # Si on est dans boucler_sur_splash, on doit supprimer
+            # le prochain appel
             self.vue.root.after_cancel(self.prochainsplash)
             self.prochainsplash = None
-        if nom:  # si c'est pas None c'est un nouveau nom
+        if nom:  # Si c'est pas None, c'est un nouveau nom
             self.mon_nom = nom
-        # on avertit le serveur qu'on cree une partie
+        # On avertit le serveur qu'on crée une partie
         url = self.urlserveur + "/creer_partie"
         params = {"nom": self.mon_nom}
         reptext = self.appeler_serveur(url, params)
+        """Réponse du serveur"""
 
-        self.joueur_createur = 1  # on est le createur
+        self.joueur_createur = 1
+        """on est le createur"""
         self.vue.root.title("je suis " + self.mon_nom)
-        # on passe au lobby pour attendre les autres joueurs
+        # On passe au lobby pour attendre les autres joueurs
         self.vue.changer_cadre("lobby")
         self.boucler_sur_lobby()
 
-    # un joueur s'inscrit à la partie, similaire à creer_partie
-    def inscrire_joueur(self, nom, urljeu):
+    def inscrire_joueur(self, nom: str, urljeu: str) -> None:
+        """Inscription d'un joueur à la partie, répétition de code avec
+        creer_partie
+        """
         # on quitte le splash et sa boucle
         if self.prochainsplash:
             self.vue.root.after_cancel(self.prochainsplash)
@@ -73,14 +133,15 @@ class Controleur():
         self.boucler_sur_lobby()
 
     # a partir du lobby, le createur avertit le serveur de changer l'etat pour courant
-    def lancer_partie(self):
+    def lancer_partie(self) -> None:
         url = self.urlserveur + "/lancer_partie"
         params = {"nom": self.mon_nom}
         reptext = self.appeler_serveur(url, params)
 
     # Apres que le createur de la partie ait lancer_partie
     # boucler_sur_lobby a reçu code ('courant') et appel cette fonction pour tous
-    def initialiser_partie(self, mondict):
+    def initialiser_partie(self, mondict: dict) -> None:
+        print(f"Initialiser_partie: {mondict = }")
         initaleatoire = mondict[1][0][0]
         random.seed(12471)  # random FIXE pour test ou ...
         # random.seed(int(initaleatoire))   # qui prend la valeur generer par le serveur
@@ -111,7 +172,8 @@ class Controleur():
     def boucler_sur_lobby(self):
         url = self.urlserveur + "/boucler_sur_lobby"
         params = {"nom": self.mon_nom}
-        mondict = self.appeler_serveur(url, params)
+        mondict: list[tuple[str, int]] | tuple[Literal["courante"], tuple[int]] = self.appeler_serveur(url, params)
+        print(f"{mondict = }")
 
         if "courante" in mondict[0]:  # courante, la partie doit etre initialiser
             self.initialiser_partie(mondict)
