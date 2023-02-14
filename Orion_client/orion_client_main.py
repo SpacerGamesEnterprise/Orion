@@ -12,6 +12,8 @@ import urllib.request
 from orion_modele import *
 from orion_vue import *
 
+# TODO: Type alias for server status
+# TODO: Change lists and tuples to sequence
 
 class Controleur():
     """Controlleur du jeu Orion, qui gère les interactions entre le modèle et la vue
@@ -140,7 +142,8 @@ class Controleur():
 
     # Apres que le createur de la partie ait lancer_partie
     # boucler_sur_lobby a reçu code ('courant') et appel cette fonction pour tous
-    def initialiser_partie(self, mondict: dict) -> None:
+    def initialiser_partie(self, mondict) -> None:
+        # TODO: Type for mondict
         print(f"Initialiser_partie: {mondict = }")
         initaleatoire = mondict[1][0][0]
         random.seed(12471)  # random FIXE pour test ou ...
@@ -151,25 +154,34 @@ class Controleur():
         for i in self.joueurs:
             listejoueurs.append(i[0])
 
-        self.modele = Modele(self,
-                             listejoueurs)  # on cree une partie pour les joueurs listes, qu'on conserve comme modele
-        self.vue.initialiser_avec_modele(self.modele)  # on fournit le modele et mets la vue à jour
-        self.vue.changer_cadre("partie")  # on change le cadre la fenetre pour passer dans l'interface de jeu
 
-        self.boucler_sur_jeu()  # on lance la boucle de jeu
+        # On crée une partie pour les joueurs, qu'on conserve comme modèle
+        self.modele = Modele(self, listejoueurs)
+
+        # On fournit le à la vue et la met à jour
+        self.vue.initialiser_avec_modele(self.modele)
+        # On change le cadre la fenêtre pour passer dans l'interface de jeu
+        self.vue.changer_cadre("partie")
+        # On lance la boucle de jeu
+        self.boucler_sur_jeu()
 
     ##########   BOUCLES: SPLASH, LOBBY ET JEU    #################
-    # boucle de communication intiale avec le serveur pour creer ou s'inscrire a la partie
-    def boucler_sur_splash(self):
+
+    def boucler_sur_splash(self) -> None:
+        """Boucle de communication intiale avec le serveur pour créer ou
+        s'inscrire à la partie
+        """
         url = self.urlserveur + "/tester_jeu"
         params = {"nom": self.mon_nom}
-        mondict = self.appeler_serveur(url, params)
+        mondict = self.appeler_serveur(url, params)  # TODO: Decode return type
         if mondict:
             self.vue.update_splash(mondict[0])
-        self.prochainsplash = self.vue.root.after(50, self.boucler_sur_splash)
+        self.prochainsplash = self.vue.root.after(
+            self.maindelai, self.boucler_sur_splash
+        )
 
-    # on boucle sur le lobby en attendant le demarrage
-    def boucler_sur_lobby(self):
+    def boucler_sur_lobby(self) -> None:
+        """Boucle sur le lobby en attendant le démarrage d'une partie"""
         url = self.urlserveur + "/boucler_sur_lobby"
         params = {"nom": self.mon_nom}
         mondict: list[tuple[str, int]] | tuple[Literal["courante"], tuple[int]] = self.appeler_serveur(url, params)
@@ -180,11 +192,13 @@ class Controleur():
         else:
             self.joueurs = mondict
             self.vue.update_lobby(mondict)
-            self.vue.root.after(50, self.boucler_sur_lobby)
+            self.vue.root.after(self.maindelai, self.boucler_sur_lobby)
 
     # BOUCLE PRINCIPALE
-    def boucler_sur_jeu(self):
-        self.cadrejeu += 1  # increment du compteur de boucle de jeu
+    def boucler_sur_jeu(self) -> None:
+        """Boucle principale du jeu"""
+        # TODO: Understand this
+        self.cadrejeu += 1  # Increment le compteur de boucle de jeu
 
         if self.cadrejeu % self.moduloappeler_serveur == 0:  # appel périodique au serveur
             if self.actionsrequises:
@@ -216,21 +230,25 @@ class Controleur():
             self.cadrejeu -= 1
             self.onjoue = 1
 
-        self.vue.root.after(self.maindelai,
-                            self.boucler_sur_jeu)  # appel ulterieur de la meme fonction jusqu'a l'arret de la partie
+        # Appel ultérieur de la même fonction jusqu'à l'arrêt de la partie
+        self.vue.root.after(
+            self.maindelai, self.boucler_sur_jeu
+        )
 
     ##############   FONCTIONS pour serveur #################
-    # methode speciale pour remettre les parametres du serveur a leurs valeurs par defaut
-    def reset_partie(self):
+    def reset_partie(self) -> tuple[tuple[Literal['dispo']]]:
+        """Méthode spéciale pour remettre les paramètres du serveur à
+        leurs valeurs par défaut
+        """
         leurl = self.urlserveur + "/reset_jeu"
         reptext = self.appeler_serveur(leurl, 0)
         self.vue.update_splash(reptext[0][0])
         return reptext
 
-    #   retour de l'etat du serveur
-    def tester_etat_serveur(self):
+    def tester_etat_serveur(self) -> str | tuple[str, tuple[str]]:
+        """Retourne l'état du serveur"""
         leurl = self.urlserveur + "/tester_jeu"
-        repdecode = self.appeler_serveur(leurl, None)[0]
+        repdecode: tuple[str] = self.appeler_serveur(leurl, None)[0]
         if "dispo" in repdecode:  # on peut creer une partie
             return ["dispo", repdecode]
         elif "attente" in repdecode:  # on peut s'inscrire a la partie
@@ -240,8 +258,15 @@ class Controleur():
         else:
             return "impossible"
 
-    # fonction d'appel normalisee d'appel pendant le jeu
-    def appeler_serveur(self, url, params):
+    # TODO: All return types, with type aliases
+    def appeler_serveur(self, url: str, params: dict):
+        """Fonction normalisée d'appel pendant le jeu
+        
+        :param url: url du server avec la route
+        :param params: Paramètres de la requête
+        
+        :return: La réponse décodée du serveur
+        """
         if params:
             query_string = urllib.parse.urlencode(params)
             data = query_string.encode("ascii")
@@ -253,32 +278,42 @@ class Controleur():
         rep = json.loads(rep)
         return rep
 
-    ###  FIN DE L'INTERDICTION DE MODIFICATION
-    #################################################################################
+    ###  FIN DE L'INTERDICTION DE MODIFICATION  ###
+    ###############################################
 
-    ############            OUTILS           ###################
-    # generateur de nouveau nom, peut y avoir collision
-    def generer_nom(self):
+    # OUTILS
+    def generer_nom(self) -> str:
+        """Générateur de nouveau nom, peut y avoir collision"""
         mon_nom = "JAJA_" + str(random.randrange(100, 1000))
         return mon_nom
 
-    def abandonner(self):
-        action = [self.mon_nom, "abandonner", [self.mon_nom + ": J'ABANDONNE !"]]
+    def abandonner(self) -> None:
+        action = [(self.mon_nom, "abandonner", [self.mon_nom + ": J'ABANDONNE !"])]
         self.actionsrequises = action
-        self.root.after(500, self.root.destroy)
+        self.vue.root.after(500, self.vue.root.destroy)
 
     ############        VOTRE CODE      ######################
+    # TODO: Verify signatures
 
-    def creer_vaisseau(self, type_vaisseau):
-        self.actionsrequises.append([self.mon_nom, "creervaisseau", [type_vaisseau]])
+    def creer_vaisseau(self, type_vaisseau: str) -> None:
+        self.actionsrequises.append(
+            [self.mon_nom, "creervaisseau", [type_vaisseau]]
+        )
 
-    def cibler_flotte(self, idorigine, iddestination, type_cible):
-        self.actionsrequises.append([self.mon_nom, "ciblerflotte", [idorigine, iddestination, type_cible]])
+    def cibler_flotte(
+        self,
+        idorigine: str,
+        iddestination: str,
+        type_cible: str
+    ) -> None:
+        self.actionsrequises.append(
+            [self.mon_nom, "ciblerflotte", [idorigine, iddestination, type_cible]]
+        )
 
-    def afficher_etoile(self, joueur, cible):
+    def afficher_etoile(self, joueur: str, cible: str) -> None:
         self.vue.afficher_etoile(joueur, cible)
 
-    def lister_objet(self, objet, id):
+    def lister_objet(self, objet: str, id: str) -> None:
         self.vue.lister_objet(objet, id)
 
 
