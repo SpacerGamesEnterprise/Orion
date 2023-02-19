@@ -137,6 +137,13 @@ def inscrire_joueur():
 
 @app.route("/boucler_sur_lobby", methods=["POST"])
 def boucler_sur_lobby():
+    """Boucle sur le lobby
+
+    :return: Si la partie est débutée:
+            La constante "courante" et la seed de random
+        Sinon:
+            Une liste des joueurs et de leurs dernier cadre de jeu
+    """
     db = Dbman()
     info = db.getinfo("partiecourante")
     if "courante" in info[0]:
