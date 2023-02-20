@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter.simpledialog import *
 from tkinter.messagebox import *
 from helper import Helper as hlp
+from PIL import Image, ImageTk
 import math
 from abc import ABC
 
@@ -23,6 +24,23 @@ class Vue(ABC):
             content.pack_forget()
         self.main_frame.pack_forget()
 
+    def img_format(file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
+        img = Image.open(file)
+        img = img.resize(dimensions)
+        img = img.convert('RGBA')
+        data = img.getdata()
+        
+        new_data = []
+        for item in data:
+            if item[0] == 255 and item[1] == 255 and item[2] == 0:  # finding yellow colour
+                # replacing it with a transparent value
+                new_data.append((255, 255, 255, 0))
+            else:
+                new_data.append(item)
+        
+        img.putdata(new_data)
+        return ImageTk.PhotoImage(img)
+
 class VueSplash(Vue):
     def __init__(self, main_frame: tk.Frame, url_serveur: str):
         super().__init__(main_frame, url_serveur)
@@ -34,7 +52,13 @@ class VueSplash(Vue):
             width=self.background_width,
             height=self.background_height,
             highlightthickness=0)
-        
+        self.background_img = self.img_format(
+            "graphics/menuBackground.png", (self.background_width,
+                                        self.background_height)
+        )
+        self.background = self.main_canvas.create_image(
+            self.background_width/2, self.background_height/2,
+            image=self.background_img)
         self.bouton_connecter = self.main_canvas.create_rectangle(
             self.background_width/2-100, self.background_height/2,
             self.background_width/2+100, self.background_height/2+50,
@@ -87,7 +111,14 @@ class VueLobby(Vue):
             width=self.background_width,
             height=self.background_height,
             highlightthickness=0)
-        
+        self.background_img = self.img_format(
+            "graphics/menuBackground.png", (self.background_width,
+                                        self.background_height)
+        )
+        self.background = self.main_canvas.create_image(
+            self.background_width/2, self.background_height/2,
+            image=self.background_img)
+        self.main_canvas.create_image()
         self.bouton_connecter = self.main_canvas.create_rectangle(
             self.background_width/2-100, self.background_height-200,
             self.background_width/2+100, self.background_height-150,
@@ -117,9 +148,9 @@ if __name__ == "__main__":
     
     
     lobby_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
-    #splash_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
-    vue = VueLobby(lobby_frame,"http://127.0.0.1:8000")
+    splash_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+    #vue = VueLobby(lobby_frame,"http://127.0.0.1:8000")
     joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
-    vue.afficher_joueurs(joueurs)
-    #vue = VueSplash(splash_frame,"http://127.0.0.1:8000")
+    #vue.afficher_joueurs(joueurs)
+    vue = VueSplash(splash_frame,"http://127.0.0.1:8000")
     root.mainloop()

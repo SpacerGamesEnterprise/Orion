@@ -10,7 +10,6 @@ import urllib.request
 from orion_modele import *
 from orion_vue import *
 
-
 class Controleur():
     def __init__(self):
         self.mon_nom = self.generer_nom()  # nom de joueur, sert d'identifiant dans le jeu - ici, avec auto-generation
