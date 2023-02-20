@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 ##  version 2022 14 mars - jmd
 
+from glob import escape
 import random
 import ast
 from Orion_client.orion_batiment import Batiment
@@ -38,7 +39,7 @@ class Trou_de_vers():
         self.porte_b.jouer_prochain_coup()
 
 
-class Etoile():
+class Planete():
     def __init__(self, parent, x, y):
         self.id = get_prochain_id()
         self.parent = parent
@@ -46,13 +47,26 @@ class Etoile():
         self.x = x
         self.y = y
         self.taille = random.randrange(4, 8)
-        self.ressources = Ressources()
+        self.batiments: list[Batiment] = []
+        self.ressources_disponibles = Ressources()
+        self.inventaire_ressources = Ressources()
+        self.max_inventaire = Ressources()
         self.batiments: list[Batiment] = []
         self.limite_batiment = 7
         
     def espace_batiment_dispo(self) -> bool:
         """Retourne si il reste de la place pour un bâtiment sur la planète"""
         return len(self.batiments) < self.limite_batiment
+    
+    def ajouter_batiment(self, batiment: Batiment) -> bool:
+        """Retourne si un batiment est ajouté dans la liste de la planete"""
+        if self.espace_batiment_dispo() \
+                and self.inventaire_ressources.has_more(batiment.cout_construction):
+            self.inventaire_ressources -= batiment.cout_construction
+            self.batiments.append(batiment)
+            return True  
+        return False
+                
 
 
 class Vaisseau():
@@ -252,7 +266,7 @@ class Modele():
         for i in range(self.nb_etoiles):
             x = random.randrange(self.largeur - (2 * bordure)) + bordure
             y = random.randrange(self.hauteur - (2 * bordure)) + bordure
-            self.etoiles.append(Etoile(self, x, y))
+            self.etoiles.append(Planete(self, x, y))
         np = len(joueurs) + ias
         etoile_occupee = []
         while np:
@@ -273,7 +287,7 @@ class Modele():
             for e in range(5):
                 x1 = random.randrange(x - dist, x + dist)
                 y1 = random.randrange(y - dist, y + dist)
-                self.etoiles.append(Etoile(self, x1, y1))
+                self.etoiles.append(Planete(self, x1, y1))
 
         # IA- creation des ias
         couleursia = ["orange", "green", "cyan",
