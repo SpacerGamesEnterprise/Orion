@@ -3,6 +3,8 @@
 
 import random
 import ast
+from Orion_client.orion_batiment import Batiment
+from Orion_client.orion_ressources import Ressources
 from id import *
 from helper import Helper as hlp
 
@@ -44,9 +46,8 @@ class Etoile():
         self.x = x
         self.y = y
         self.taille = random.randrange(4, 8)
-        self.ressources = {"metal": 1000,
-                           "energie": 10000,
-                           "existentielle": 100}
+        self.ressources = Ressources()
+        self.batiments: list[Batiment] = []
 
 
 class Vaisseau():
