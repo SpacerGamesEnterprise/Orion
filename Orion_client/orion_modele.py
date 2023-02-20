@@ -46,7 +46,6 @@ class Planete():
         self.x = x
         self.y = y
         self.taille = random.randrange(4, 8)
-        self.batiments: list[Batiment] = []
         self.ressources_disponibles = Ressources()
         self.inventaire_ressources = Ressources()
         self.max_inventaire = Ressources()
