@@ -48,6 +48,11 @@ class Etoile():
         self.taille = random.randrange(4, 8)
         self.ressources = Ressources()
         self.batiments: list[Batiment] = []
+        self.limite_batiment = 7
+        
+    def limite_batiment_depasse(self) -> bool:
+        return len(self.batiment) > self.limite_batiment
+
 
 
 class Vaisseau():
