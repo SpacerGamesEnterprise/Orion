@@ -1,6 +1,4 @@
 from __future__ import annotations
-from multiprocessing.sharedctypes import Value
-from xmlrpc.client import Boolean
 
 class Ressources(dict):
     """Classe qui contient les ressources
