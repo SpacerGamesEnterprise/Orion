@@ -50,9 +50,9 @@ class Etoile():
         self.batiments: list[Batiment] = []
         self.limite_batiment = 7
         
-    def limite_batiment_depasse(self) -> bool:
-        return len(self.batiment) > self.limite_batiment
-
+    def espace_batiment_dispo(self) -> bool:
+        """Retourne si il reste de la place pour un bâtiment sur la planète"""
+        return len(self.batiments) < self.limite_batiment
 
 
 class Vaisseau():
