@@ -48,6 +48,11 @@ class Etoile():
         self.taille = random.randrange(4, 8)
         self.ressources = Ressources()
         self.batiments: list[Batiment] = []
+        self.limite_batiment = 7
+        
+    def espace_batiment_dispo(self) -> bool:
+        """Retourne si il reste de la place pour un bâtiment sur la planète"""
+        return len(self.batiments) < self.limite_batiment
 
 
 class Vaisseau():
