@@ -153,19 +153,43 @@ class VueLobby(Vue):
     def afficher_joueurs(self, joueurs : list[str]):
            for joueur in joueurs:
                 self.liste_lobby.insert(END, joueur)
+                
+class VuePartie(Vue):
+    def __init__(self, main_frame: tk.Frame, url_serveur: str):
+        super().__init__(main_frame, url_serveur)
+        
+        self.background_width = 1200
+        self.background_height = 800
+        
+        self.taille_minimap = 240
+        self.ecart_minimap = 25
+        
+        root.geometry(f"{self.background_width}x{self.background_height}")
+        
+        self.minimap = tk.Canvas(self.main_frame, width=self.taille_minimap, height=self.taille_minimap,
+                                      bg="pink")
+        #self.canevas_minimap.bind("<Button>", self.positionner_minicanevas)
+        self.minimap.place(x=(self.background_width-self.taille_minimap-self.ecart_minimap),y=self.ecart_minimap)
+        
+        
+        
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.geometry("800x800")
     root.resizable(False,False)
-    lobby_frame = tk.Frame(root)
-    splash_frame = tk.Frame(root)
+    main_frame = tk.Frame(root)
     
     
-    lobby_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
-    splash_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
-    #vue = VueLobby(lobby_frame,"http://127.0.0.1:8000")
+    
+    main_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+    
+    #vue = VueLobby(main_frame,"http://127.0.0.1:8000")
     joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
     #vue.afficher_joueurs(joueurs)
-    vue = VueSplash(splash_frame,"http://127.0.0.1:8000")
+    
+    
+    #vue = VueSplash(main_frame,"http://127.0.0.1:8000")
+    
+    vue = VuePartie(main_frame, "http://127.0.0.1:8000")
     root.mainloop()
