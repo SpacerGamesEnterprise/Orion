@@ -24,7 +24,7 @@ class Vue(ABC):
             content.pack_forget()
         self.main_frame.pack_forget()
 
-    def img_format(file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
+    def img_format(self,file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
         img = Image.open(file)
         img = img.resize(dimensions)
         img = img.convert('RGBA')
@@ -53,7 +53,7 @@ class VueSplash(Vue):
             height=self.background_height,
             highlightthickness=0)
         self.background_img = self.img_format(
-            "graphics/menuBackground.png", (self.background_width,
+            "Orion_client/graphics/menuBackground.png", (self.background_width,
                                         self.background_height)
         )
         self.background = self.main_canvas.create_image(
@@ -66,7 +66,7 @@ class VueSplash(Vue):
         self.bouton_creer_partie = self.main_canvas.create_rectangle(
             self.background_width/4-150, self.background_height-100,
             self.background_width/4+50, self.background_height-50,
-            fill="red")
+            fill="blue")
         self.bouton_inscrire_joueur = self.main_canvas.create_rectangle(
             self.background_width/2-100, self.background_height-100,
             self.background_width/2+100, self.background_height-50,
@@ -74,15 +74,31 @@ class VueSplash(Vue):
         self.bouton_reinitialiser_partie = self.main_canvas.create_rectangle(
             ((self.background_width/4)*3)-50, self.background_height-100,
             ((self.background_width/4)*3)+150, self.background_height-50,
-            fill="green"
+            fill="blue"
         )
         self.message = self.main_canvas.create_text(
             self.background_width/2, self.background_height/5,
-            text="Non connecté", font=('Helvetica 15 bold'),fill="black"
+            text="Non connecté", font=('Helvetica 15 bold'),fill="white"
+        )
+        self.bouton_reinitialiser_partie_message = self.main_canvas.create_text(
+            ((self.background_width/4)*3)+50, self.background_height-75,
+            text="Reinitialiser partie", font=('Helvetica 10 bold'),fill="white"
+        )
+        self.bouton_rejoindre_partie_message = self.main_canvas.create_text(
+            self.background_width/2, self.background_height-75,
+            text="Rejoindre partie", font=('Helvetica 10 bold'),fill="white"
+        )
+        self.bouton_connecter_message = self.main_canvas.create_text(
+            self.background_width/2, self.background_height/2+25,
+            text="Connecter", font=('Helvetica 10 bold'),fill="white"
+        )
+        self.bouton_creer_partie_message = self.main_canvas.create_text(
+            self.background_width/4-50, self.background_height-75,
+            text="Creer partie", font=('Helvetica 10 bold'),fill="white"
         )
         self.input_nom = tk.Entry(
             self.main_frame,
-            font=('Helvetica 30 bold'))
+            font=('Helvetica 20 bold'))
 
         self.input_url = tk.Entry(
             self.main_frame,
@@ -112,13 +128,12 @@ class VueLobby(Vue):
             height=self.background_height,
             highlightthickness=0)
         self.background_img = self.img_format(
-            "graphics/menuBackground.png", (self.background_width,
+            "Orion_client/graphics/menuBackground.png", (self.background_width,
                                         self.background_height)
         )
         self.background = self.main_canvas.create_image(
             self.background_width/2, self.background_height/2,
             image=self.background_img)
-        self.main_canvas.create_image()
         self.bouton_connecter = self.main_canvas.create_rectangle(
             self.background_width/2-100, self.background_height-200,
             self.background_width/2+100, self.background_height-150,
@@ -126,10 +141,10 @@ class VueLobby(Vue):
 
         self.url = self.main_canvas.create_text(
             self.background_width*0.5,self.background_height*0.23,
-            text=self.url_serveur, font=('Helvetica 15 bold'),fill="black"
+            text=self.url_serveur, font=('Helvetica 15 bold'),fill="white"
         )
 
-        self.liste_lobby = tk.Listbox(self.main_frame,borderwidth=2)
+        self.liste_lobby = tk.Listbox(self.main_frame,borderwidth=0)
 
         self.main_canvas.place(x=0,y=0)
 
