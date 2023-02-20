@@ -3,8 +3,9 @@
 
 import random
 import ast
-from Orion_client.orion_batiment import Batiment
-from Orion_client.orion_ressources import Ressources
+from modeles.batiment import *
+from modeles.vaisseau import *
+from modeles.ressources import Ressources
 from id import *
 from helper import Helper as hlp
 
@@ -51,6 +52,7 @@ class Planete():
         self.max_inventaire = Ressources()
         self.batiments: list[Batiment] = []
         self.limite_batiment = 7
+        self.vaisseaux = []
         
     def espace_batiment_dispo(self) -> bool:
         """Retourne si il reste de la place pour un bâtiment sur la planète"""
@@ -64,7 +66,17 @@ class Planete():
             self.batiments.append(batiment)
             return True  
         return False
-                
+    
+    def creer_vaisseau(self, vaisseau: Vaisseau) -> bool:
+        """Retourne si un vaisseau est créer"""
+        hangars = [bat for bat in self.batiments if isinstance(bat, Hangar)]
+        if self.inventaire_ressources.has_more(vaisseau.cout_construction) \
+                and hangars:     
+            self.inventaire_ressources -= vaisseau.cout_construction
+            self.vaisseaux.append(vaisseau)
+            return True  
+        return False
+            
 
 
 class Vaisseau():

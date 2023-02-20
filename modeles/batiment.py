@@ -1,6 +1,7 @@
 from abc import ABC
 
-from Orion_client.orion_ressources import Ressources
+from modeles.ressources import Ressources
+from modeles.vaisseau import Vaisseau
 
 class Batiment(ABC):
     """Classe parente des types de batiments"""
@@ -87,6 +88,7 @@ class Hangar(Batiment):
     
     def __init__(self):
         super().__init__()
+        
 
 class Laboratoire(Batiment):
     """Batiment qui permet de debloquer des competences"""
