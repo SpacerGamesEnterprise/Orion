@@ -1,6 +1,6 @@
 from abc import ABC
 import random
-from Orion_client.id import *
+from Orion_client.id import get_prochain_id
 from modeles.ressources import Ressources
 from Orion_client.helper import Helper as hlp
 
@@ -118,4 +118,4 @@ class Combat(Vaisseau):
             population=15)
         self.taille = 4
         self.vitesse = 4
-        self.ang = 0        
+        self.ang = 0

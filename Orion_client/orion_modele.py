@@ -2,11 +2,10 @@
 ##  version 2022 14 mars - jmd
 
 import random
-import ast
-from modeles.batiment import *
-from modeles.vaisseau import *
+from modeles.batiment import Batiment, Hangard
+from modeles.vaisseau import Vaisseau
 from modeles.ressources import Ressources
-from id import *
+from id import get_prochain_id
 from helper import Helper as hlp
 
 
