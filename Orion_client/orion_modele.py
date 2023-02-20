@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ##  version 2022 14 mars - jmd
 
-from glob import escape
 import random
 import ast
 from Orion_client.orion_batiment import Batiment
