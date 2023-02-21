@@ -5,6 +5,7 @@ from helper import Helper as hlp
 from PIL import Image, ImageTk
 import math
 from abc import ABC
+from orion_vue import Vue as v
 
 
 import random
@@ -96,6 +97,9 @@ class VueSplash(Vue):
             self.background_width/4-50, self.background_height-75,
             text="Creer partie", font=('Helvetica 10 bold'),fill="white"
         )
+        #Essaie pour lier les boutons avec les canvas
+        #self.bouton_creer_partie = tk.Button(text=self.bouton_creer_partie_message, width=self.background_width, height=self.background_height,
+        #    bg="blue", command=v.creer_partie)
         self.input_nom = tk.Entry(
             self.main_frame,
             font=('Helvetica 20 bold'))
@@ -170,7 +174,12 @@ class VuePartie(Vue):
                                       bg="pink")
         #self.canevas_minimap.bind("<Button>", self.positionner_minicanevas)
         self.minimap.place(x=(self.background_width-self.taille_minimap-self.ecart_minimap),y=self.ecart_minimap)
-        
+        self.cadreoutils_v = tk.Frame(self.main_frame, width=200, height=200, bg="darkgrey")
+        self.cadreoutils_v.pack(side=LEFT, fill=Y)
+        self.cadreoutils_h = tk.Frame(self.main_frame, width=75, height=75, bg="darkgrey")
+        self.cadreoutils_h.pack(side=BOTTOM, fill=X)
+        self.cadreinfo = tk.Frame(self.cadreoutils_v, width=200, height=200, bg="black")
+        self.cadreinfo.pack(fill=BOTH)
         
         
 
