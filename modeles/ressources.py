@@ -20,14 +20,14 @@ class Ressources(dict):
         self ["population"] = population
         
     def __add__(self, other: Ressources) -> Ressources: 
-        return Ressources(
+        return  Ressources(
             metal=self["metal"] + other["metal"],
             bois=self["bois"] + other["bois"],
             energie=self["energie"] + other["energie"],
             nourriture=self["nourriture"] + other["nourriture"],
             population=self["population"] + other["population"]
         )
-
+        
     def __sub__(self, other: Ressources) -> Ressources: 
         return Ressources(
             metal=self["metal"] - other["metal"],
@@ -36,6 +36,8 @@ class Ressources(dict):
             nourriture=self["nourriture"] - other["nourriture"],
             population=self["population"] - other["population"]
         )
+
+#ajouter multiplier et diviser
 
     def has_more(self, other: Ressources) -> bool:
         for key, value in other.items():

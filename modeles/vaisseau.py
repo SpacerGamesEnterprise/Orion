@@ -3,15 +3,16 @@ import random
 from Orion_client.id import get_prochain_id
 from modeles.ressources import Ressources
 from Orion_client.helper import Helper as hlp
+from modeles.position import Point
 
 class Vaisseau(ABC):  
     """Classe parente des types de vaisseau"""
 
-    def __init__(self, parent, nom, position: list[float]):
-        self.parent = parent
+    def __init__(self, nom, position: Point):
+        #self.parent = parent
         self.id: int = get_prochain_id()
         self.proprietaire: str = nom
-        self.position: list[float] = position
+        self.position: Point = position
         self.espace_cargo: Ressources = Ressources()
         self.taille: int = 5
         self.vitesse: int = 2
@@ -22,8 +23,19 @@ class Vaisseau(ABC):
         self.cible = 0
         self.type_cible = None
         self.angle_cible = 0
-        self.arriver = {"Etoile": self.arriver_etoile,
-                        "Porte_de_vers": self.arriver_porte}
+        #self.arriver = {"Etoile": self.arriver_etoile,
+                        #"Porte_de_vers": self.arriver_porte}
+                        
+                        
+    def ameliorer(self, inventaire_planete: Ressources) -> Ressources:
+        """Retourne l'inventaire de la planete et augmente le niveau du vaissseau"""
+        if inventaire_planete.has_more(self.cout_construction + self.cout_construction):
+            self.cout_construction += self.cout_construction        
+            inventaire_planete -= self.cout_construction
+            self.niveau += 1
+        return inventaire_planete      
+    
+                            
 
     def jouer_prochain_coup(self, trouver_nouveau=0):
         if self.cible != 0:
@@ -47,33 +59,33 @@ class Vaisseau(ABC):
                 rep = self.arriver[type_obj]()
                 return rep
 
-    def arriver_etoile(self):
-        self.parent.log.append(
-            ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
-        if not self.cible.proprietaire:
-            self.cible.proprietaire = self.proprietaire
-        cible = self.cible
-        self.cible = 0
-        return ["Etoile", cible]
+    # def arriver_etoile(self):
+    #     self.parent.log.append(
+    #         ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
+    #     if not self.cible.proprietaire:
+    #         self.cible.proprietaire = self.proprietaire
+    #     cible = self.cible
+    #     self.cible = 0
+    #     return ["Etoile", cible]
 
-    def arriver_porte(self):
-        self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
-        cible = self.cible
-        trou = cible.parent
-        if cible == trou.porte_a:
-            self.x = trou.porte_b.x + random.randrange(6) + 2
-            self.y = trou.porte_b.y
-        elif cible == trou.porte_b:
-            self.x = trou.porte_a.x - random.randrange(6) + 2
-            self.y = trou.porte_a.y
-        self.cible = 0
-        return ["Porte_de_ver", cible]
+    # def arriver_porte(self):
+    #     self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
+    #     cible = self.cible
+    #     trou = cible.parent
+    #     if cible == trou.porte_a:
+    #         self.x = trou.porte_b.x + random.randrange(6) + 2
+    #         self.y = trou.porte_b.y
+    #     elif cible == trou.porte_b:
+    #         self.x = trou.porte_a.x - random.randrange(6) + 2
+    #         self.y = trou.porte_a.y
+    #     self.cible = 0
+    #     return ["Porte_de_ver", cible]
 
 
 class Cargo(Vaisseau):
     """Vaisseau qui transporte des ressources"""
-    def __init__(self, parent, nom, position):
-        super().__init__(parent, nom, position)
+    def __init__(self, nom, position):
+        super().__init__(nom, position)
         self.nom_vaisseau = "Cargo"
         self.cout_construction = Ressources(metal=1000, bois=500, energie=1500)
         self.espace_cargo = Ressources(
@@ -85,12 +97,11 @@ class Cargo(Vaisseau):
         )
         self.taille = 8
         self.vitesse = 1
-        self.ang = 0
 
 class Eclaireur(Vaisseau):
     """Vaisseau avec une puissance faible dont le but est d'explorer rapidement"""
-    def __init__(self, parent, nom, position):
-        super().__init__(parent, nom, position)
+    def __init__(self, nom, position):
+        super().__init__(nom, position)
         self.nom_vaisseau = "Éclaireur"
         self.cout_construction = Ressources(metal=250, bois=150, energie=500)
         self.espace_cargo = Ressources(
@@ -102,12 +113,11 @@ class Eclaireur(Vaisseau):
         )
         self.taille = 2
         self.vitesse = 7
-        self.ang = 0
 
 class Combat(Vaisseau):
     """Vaisseau avec une haute puissance dont le but est de combatre """
-    def __init__(self, parent, nom, position):
-        super().__init__(parent, nom, position)
+    def __init__(self, nom, position):
+        super().__init__( nom, position)
         self.nom_vaisseau = "Combat"
         self.cout_construction = Ressources(metal=500, bois=100, energie=750)
         self.espace_cargo = Ressources(
@@ -118,4 +128,3 @@ class Combat(Vaisseau):
             population=15)
         self.taille = 4
         self.vitesse = 4
-        self.ang = 0
