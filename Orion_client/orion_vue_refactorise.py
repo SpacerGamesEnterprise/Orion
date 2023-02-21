@@ -7,6 +7,8 @@ import math
 from abc import ABC
 from orion_vue import Vue as v
 
+#import temporaire
+from orion_modele import *
 
 import random
 
@@ -158,7 +160,7 @@ class VueLobby(Vue):
            for joueur in joueurs:
                 self.liste_lobby.insert(END, joueur)
                 
-class VuePartie(Vue):
+class VueHUD(Vue):
     def __init__(self, main_frame: tk.Frame, url_serveur: str):
         super().__init__(main_frame, url_serveur)
         
@@ -171,27 +173,80 @@ class VuePartie(Vue):
         root.geometry(f"{self.background_width}x{self.background_height}")
         
         self.minimap = tk.Canvas(self.main_frame, width=self.taille_minimap, height=self.taille_minimap,
-                                      bg="pink")
+                                      bg="#525252")
         #self.canevas_minimap.bind("<Button>", self.positionner_minicanevas)
         self.minimap.place(x=(self.background_width-self.taille_minimap-self.ecart_minimap),y=self.ecart_minimap)
-        self.cadreoutils_v = tk.Frame(self.main_frame, width=200, height=200, bg="darkgrey")
-        self.cadreoutils_v.pack(side=LEFT, fill=Y)
-        self.cadreoutils_h = tk.Frame(self.main_frame, width=75, height=75, bg="darkgrey")
-        self.cadreoutils_h.pack(side=BOTTOM, fill=X)
-        self.cadreinfo = tk.Frame(self.cadreoutils_v, width=200, height=200, bg="black")
+        self.cadreoutils_h = tk.Frame(self.main_frame, width=75, height=75, bg="darkgrey", highlightthickness="3",highlightbackground="#525252")
+        self.cadreoutils_h.place(x=0,rely=0.9,relheight=0.1,relwidth=1)
+        self.cadreoutils_v = tk.Frame(self.main_frame, width=200, height=200, bg="darkgrey", highlightthickness="3",highlightbackground="#525252")
+        self.cadreoutils_v.place(x=0,y=0,relheight=0.9,relwidth=0.2)
+        
+        self.cadreinfo = tk.Frame(self.cadreoutils_v, width=200, height=200, bg="#525252", highlightthickness="3",highlightbackground="darkgrey")
         self.cadreinfo.pack(fill=BOTH)
         
+class VueCosmos(Vue):
+    def __init__(self, main_frame: tk.Frame, url_serveur: str):
+        super().__init__(main_frame, url_serveur)
         
+        self.background_width = 1200
+        self.background_height = 80
+        self.map_size = 9000
+        self.zoom = 2
+        
+        self.modele = None #initialisé avec "initialiser_avec_modele"
+        
+        self.main_canvas = tk.Canvas(self.main_frame,height=self.map_size,width=self.map_size,bg="#2f2d38")
+        self.main_canvas.pack()
+    def afficher_decor(self,mod):
+        # on cree un arriere fond de petites etoieles NPC pour le look
+        for i in range(len(mod.etoiles) * 50):
+            x = random.randrange(int(mod.largeur))
+            y = random.randrange(int(mod.hauteur))
+            n = random.randrange(3) + 1
+            col = random.choice(["LightYellow", "azure1", "pink"])
+            self.main_canvas.create_oval(x, y, x + n, y + n, fill=col, tags=("fond",))
+        # affichage des etoiles
+        for i in mod.etoiles:
+            t = i.taille * self.zoom
+            self.main_canvas.create_oval(i.x - t, i.y - t, i.x + t, i.y + t,
+                                     fill="grey80", outline=col,
+                                     tags=(i.proprietaire, str(i.id), "Etoile",))
+        # affichage des etoiles possedees par les joueurs
+        for i in mod.joueurs.keys():
+            for j in mod.joueurs[i].etoilescontrolees:
+                t = j.taille * self.zoom
+                self.main_canvas.create_oval(j.x - t, j.y - t, j.x + t, j.y + t,
+                                         fill=mod.joueurs[i].couleur,
+                                         tags=(j.proprietaire, str(j.id), "Etoile"))
+                # on affiche dans minimap
+                #minix = j.x / self.modele.largeur * self.taille_minimap
+                #miniy = j.y / self.modele.hauteur * self.taille_minimap
+                #self.canevas_minimap.create_rectangle(minix, miniy, minix + 3, miniy + 3,
+                #                                      fill=mod.joueurs[i].couleur,
+                #                                      tags=(j.proprietaire, str(j.id), "Etoile"))
+                
+    def initialiser_avec_modele(self, modele):
+        #self.mon_nom = self.parent.mon_nom
+        self.modele = modele
+        self.main_canvas.config(scrollregion=(0, 0, modele.largeur, modele.hauteur))
+
+        #self.labid.config(text=self.mon_nom)
+        #self.labid.config(fg=self.modele.joueurs[self.mon_nom].couleur)
+
+        self.afficher_decor(modele)
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.geometry("800x800")
     root.resizable(False,False)
-    main_frame = tk.Frame(root)
+    game_frame = tk.Frame(root)
+    
+    
+    #modele temporaire pour gameView
+    modele = Modele(None, [])
     
     
     
-    main_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
     
     #vue = VueLobby(main_frame,"http://127.0.0.1:8000")
     joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
@@ -199,6 +254,13 @@ if __name__ == "__main__":
     
     
     #vue = VueSplash(main_frame,"http://127.0.0.1:8000")
+    vueCosmos = VueCosmos(game_frame, "http://127.0.0.1:8000")
+    vueHUD = VueHUD(game_frame, "http://127.0.0.1:8000")
     
-    vue = VuePartie(main_frame, "http://127.0.0.1:8000")
+
+    
+    vueCosmos.initialiser_avec_modele(modele)
+    vueCosmos.afficher_decor(modele)
+    
+    game_frame.place(relx=0, rely=0,relheight=1,relwidth=1)
     root.mainloop()
