@@ -1,10 +1,13 @@
-"""
-Gestionnaire de tout ce qui est côté client. Aucune communication directe
+"""Gestionnaire de tout ce qui est côté client. Aucune communication directe
 avec le serveur.
 """
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from controleur_serveur import Controleur
 
 import tkinter as tk
 
@@ -12,16 +15,14 @@ from vue import Vue, VueSplash
 
 class GestionnaireVue(ABC):
     """Classe de base pour tous les gestionnaires de vues."""
-    def __init__(self, root: tk.Tk):
-        self.root = root
-
-        self.main_frame = tk.Frame(root)
-
-        self.vue: Vue  # TODO: Importer Vue
+    def __init__(self, parent: GestionnaireVue):
+        self.vue: Vue
         """Vue de chaque gestionnaire."""
+        self.parent = parent
+        """Parent du gestionnaire (le gestionnaire qui l'a créé)."""
 
     @abstractmethod
-    def debuter(self):
+    def debuter(self):  # TODO: Enlever ou changer le nom
         """Débute le gestionnaire et affiche la vue."""
         pass
 
@@ -32,14 +33,30 @@ class GestionnaireVue(ABC):
 
     def entrer(self, gestionaire: GestionnaireVue):
         """Entre dans un nouveau gestionnaire imbriqué (sous-menu)."""
-        raise NotImplementedError
+        self.vue.forget()
 
 
 class GestionnaireSplash(GestionnaireVue):
-    def __init__(self, root: tk.Tk):
-        super().__init__(root)
+    """Gestionnaire maître de l'application."""
+    def __init__(self, parent: GestionnaireVue, controleur: Controleur):
+        super().__init__(parent)
+        self.root = tk.Tk()
 
-        self.vue = VueSplash(self)
+        self.controleur = controleur
+        self.vue = VueSplash(self.root)
+
+        self.vue.input_url.bind("<Return>", self._update_url)
+        self.vue.main_canvas.tag_bind(
+            self.vue.bouton_connecter, "<Button-1>",
+            self.controleur.connecter_serveur
+        )
+
+        self.vue.afficher()
+        self.vue.master.mainloop()
+
+    def _update_url(self, _):
+        url = self.vue.input_url.get()
+        self.controleur.urlserveur = url
 
     def debuter(self):
         self.vue.afficher()
@@ -50,6 +67,3 @@ class GestionnaireSplash(GestionnaireVue):
     def entrer(self, gestionaire: GestionnaireVue):
         self.vue.cacher()
         gestionaire.debuter()
-
-
-

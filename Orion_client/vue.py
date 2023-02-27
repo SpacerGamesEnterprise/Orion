@@ -1,18 +1,18 @@
+from abc import ABC
 import tkinter as tk
 from tkinter.simpledialog import *
 from tkinter.messagebox import *
 from helper import Helper as hlp
 from PIL import Image, ImageTk
 import math
-from abc import ABC
-from orion_vue import Vue as v
 
 #import temporaire
 from orion_modele import *
 
 import random
 
-def img_format(self, file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
+
+def img_format(file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
     img = Image.open(file)
     img = img.resize(dimensions)
     img = img.convert('RGBA')
@@ -31,10 +31,14 @@ def img_format(self, file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
 
 
 class Vue(ABC):
-    def __init__(self,main_frame:tk.Frame, url_serveur: str):
-        self.main_frame = main_frame
-        self.url_serveur = url_serveur
-    
+    def __init__(self, master: tk.Widget):
+        self.master = master
+        self.main_frame = tk.Frame(master)
+
+    def afficher(self):
+        """Méthode d'affichage de la vue"""
+        self.main_frame.place(relx=0.5, rely=0.5, relheight=1, relwidth=1, anchor=tk.CENTER)
+
     def destroy(self):
         """Méthode de destruction de la vue"""
         self.main_frame.forget()
@@ -45,8 +49,11 @@ class Vue(ABC):
             content.pack_forget()
         self.main_frame.pack_forget()
 
-    def __init__(self, main_frame: tk.Frame, url_serveur: str):
-        super().__init__(main_frame, url_serveur)
+
+class VueSplash(Vue):
+    def __init__(self, master: tk.Widget):
+        super().__init__(master)
+        self.master.geometry("800x800")
         self.background_width = 800
         self.background_height = 800
 
@@ -109,7 +116,7 @@ class Vue(ABC):
         self.input_url = tk.Entry(
             self.main_frame,
             font=('Helvetica 20 bold'))
-        self.input_url.insert(0,self.url_serveur)
+        # self.input_url.insert(0,self.url_serveur)  # TODO: CHANGE THIS
 
 
         self.main_canvas.place(x=0,y=0)
@@ -123,8 +130,8 @@ class Vue(ABC):
         
 
 class VueLobby(Vue):
-    def __init__(self, main_frame: tk.Frame, url_serveur: str):
-        super().__init__(main_frame, url_serveur)
+    def __init__(self, master: tk.Widget):
+        super().__init__(master)
         self.background_width = 800
         self.background_height = 800
 
@@ -147,7 +154,7 @@ class VueLobby(Vue):
 
         self.url = self.main_canvas.create_text(
             self.background_width*0.5,self.background_height*0.23,
-            text=self.url_serveur, font=('Helvetica 15 bold'),fill="white"
+            text=self.url_serveur, font=('Helvetica 15 bold'),fill="white"  # TODO: CHANGE URL
         )
 
         self.liste_lobby = tk.Listbox(self.main_frame,borderwidth=0)
@@ -161,8 +168,8 @@ class VueLobby(Vue):
                 self.liste_lobby.insert(END, joueur)
                 
 class VueHUD(Vue):
-    def __init__(self, main_frame: tk.Frame, url_serveur: str):
-        super().__init__(main_frame, url_serveur)
+    def __init__(self, master: tk.Widget):
+        super().__init__(master)
         
         self.background_width = 1200
         self.background_height = 800
@@ -185,8 +192,8 @@ class VueHUD(Vue):
         self.cadreinfo.pack(fill=BOTH)
         
 class VueCosmos(Vue):
-    def __init__(self, main_frame: tk.Frame, url_serveur: str):
-        super().__init__(main_frame, url_serveur)
+    def __init__(self, master: tk.Widget):
+        super().__init__(master)
         
         self.background_width = 1200
         self.background_height = 80
@@ -197,7 +204,8 @@ class VueCosmos(Vue):
         
         self.main_canvas = tk.Canvas(self.main_frame,height=self.map_size,width=self.map_size,bg="#2f2d38")
         self.main_canvas.pack()
-    def afficher_decor(self,mod):
+
+    def afficher_decor(self, mod): # TODO: faire un truc plus propre
         # on cree un arriere fond de petites etoieles NPC pour le look
         for i in range(len(mod.etoiles) * 50):
             x = random.randrange(int(mod.largeur))
@@ -245,22 +253,20 @@ if __name__ == "__main__":
     #modele temporaire pour gameView
     modele = Modele(None, [])
     
-    
-    
-    
     #vue = VueLobby(main_frame,"http://127.0.0.1:8000")
     joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
     #vue.afficher_joueurs(joueurs)
     
     
-    #vue = VueSplash(main_frame,"http://127.0.0.1:8000")
-    vueCosmos = VueCosmos(game_frame, "http://127.0.0.1:8000")
-    vueHUD = VueHUD(game_frame, "http://127.0.0.1:8000")
+    vue = VueSplash()
+    vue.afficher()
+    # vueCosmos = VueCosmos()
+    # vueHUD = VueHUD()
     
 
     
-    vueCosmos.initialiser_avec_modele(modele)
-    vueCosmos.afficher_decor(modele)
+    # vueCosmos.initialiser_avec_modele(modele)
+    # vueCosmos.afficher_decor(modele)
     
-    game_frame.place(relx=0, rely=0,relheight=1,relwidth=1)
+    # game_frame.place(relx=0, rely=0,relheight=1,relwidth=1)
     root.mainloop()
