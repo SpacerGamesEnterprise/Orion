@@ -12,6 +12,24 @@ from orion_modele import *
 
 import random
 
+def img_format(self, file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
+    img = Image.open(file)
+    img = img.resize(dimensions)
+    img = img.convert('RGBA')
+    data = img.getdata()
+    
+    new_data = []
+    for item in data:
+        if item[0] == 255 and item[1] == 255 and item[2] == 0:  # finding yellow colour
+            # replacing it with a transparent value
+            new_data.append((255, 255, 255, 0))
+        else:
+            new_data.append(item)
+    
+    img.putdata(new_data)
+    return ImageTk.PhotoImage(img)
+
+
 class Vue(ABC):
     def __init__(self,main_frame:tk.Frame, url_serveur: str):
         self.main_frame = main_frame
@@ -27,24 +45,6 @@ class Vue(ABC):
             content.pack_forget()
         self.main_frame.pack_forget()
 
-    def img_format(self,file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
-        img = Image.open(file)
-        img = img.resize(dimensions)
-        img = img.convert('RGBA')
-        data = img.getdata()
-        
-        new_data = []
-        for item in data:
-            if item[0] == 255 and item[1] == 255 and item[2] == 0:  # finding yellow colour
-                # replacing it with a transparent value
-                new_data.append((255, 255, 255, 0))
-            else:
-                new_data.append(item)
-        
-        img.putdata(new_data)
-        return ImageTk.PhotoImage(img)
-
-class VueSplash(Vue):
     def __init__(self, main_frame: tk.Frame, url_serveur: str):
         super().__init__(main_frame, url_serveur)
         self.background_width = 800
@@ -55,7 +55,7 @@ class VueSplash(Vue):
             width=self.background_width,
             height=self.background_height,
             highlightthickness=0)
-        self.background_img = self.img_format(
+        self.background_img = img_format(
             "Orion_client/graphics/menuBackground.png", (self.background_width,
                                         self.background_height)
         )

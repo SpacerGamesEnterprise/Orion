@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 
 import tkinter as tk
 
+from vue import Vue, VueSplash
 
 class GestionnaireVue(ABC):
     """Classe de base pour tous les gestionnaires de vues."""
@@ -34,11 +35,11 @@ class GestionnaireVue(ABC):
         raise NotImplementedError
 
 
-class GestionnaireMenuPrincipal(GestionnaireVue):
+class GestionnaireSplash(GestionnaireVue):
     def __init__(self, root: tk.Tk):
         super().__init__(root)
 
-        self.vue = VueMenuPrincipal(self)
+        self.vue = VueSplash(self)
 
     def debuter(self):
         self.vue.afficher()
@@ -49,4 +50,6 @@ class GestionnaireMenuPrincipal(GestionnaireVue):
     def entrer(self, gestionaire: GestionnaireVue):
         self.vue.cacher()
         gestionaire.debuter()
+
+
 
