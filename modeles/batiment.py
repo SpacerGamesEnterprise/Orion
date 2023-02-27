@@ -25,7 +25,7 @@ class Batiment(ABC):
     def reparer(self):
         raise NotImplementedError
     
-    def consommerRessources(self):
+    def consommer_ressources(self):
         raise NotImplementedError
     
     def detruire(self):
@@ -93,7 +93,12 @@ class Hangar(Batiment):
         super().__init__()
         
         
-    def creer_vaisseau(self, vaisseau: Vaisseau, inventaire_planete: Ressources, liste_vaisseaux) -> Ressources:
+    def creer_vaisseau(
+            self,
+            vaisseau: Vaisseau,
+            inventaire_planete: Ressources,
+            liste_vaisseaux: list[Vaisseau]
+    ) -> Ressources:
         """Retourne l'inventaire de la planete"""
         if inventaire_planete.has_more(vaisseau.cout_construction):
             inventaire_planete -= vaisseau.cout_construction

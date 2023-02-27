@@ -117,7 +117,7 @@ class Eclaireur(Vaisseau):
 class Combat(Vaisseau):
     """Vaisseau avec une haute puissance dont le but est de combatre """
     def __init__(self, nom, position):
-        super().__init__( nom, position)
+        super().__init__(nom, position)
         self.nom_vaisseau = "Combat"
         self.cout_construction = Ressources(metal=500, bois=100, energie=750)
         self.espace_cargo = Ressources(

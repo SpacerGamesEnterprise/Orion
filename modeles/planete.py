@@ -13,17 +13,17 @@ class Planete():
         self.y = y
         self.taille = random.randrange(4, 8)
         self.ressources_disponibles = Ressources(
-            metal= random.randrange(1000, 10000000),
-            bois= random.randrange(1000, 10000000),
-            nourriture= random.randrange(1000, 10000000)
+            metal=random.randrange(1_000, 10_000_000),
+            bois=random.randrange(1_000, 10_000_000),
+            nourriture=random.randrange(1_000, 10_000_000)
         )
         self.inventaire_ressources = Ressources()
         self.max_inventaire = Ressources(
-            metal= 10000,
-            bois=10000,
-            energie=50000,
-            nourriture=10000,
-            population=10000
+            metal=10_000,
+            bois=10_000,
+            energie=50_000,
+            nourriture=10_000,
+            population=10_000
         )
         self.batiments: list[Batiment] = []
         self.limite_batiment = 4
