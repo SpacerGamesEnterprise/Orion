@@ -27,14 +27,20 @@ class Ressources(dict):
             nourriture=self["nourriture"] + other["nourriture"],
             population=self["population"] + other["population"]
         )
-    def __sub__(self, other: Ressources) -> Ressources: 
+
+    def __sub__(self, other: Ressources) -> Ressources:
         return Ressources(
-            metal=self["metal"] - other["metal"],
-            bois=self["bois"] - other["bois"],
-            energie=self["energie"] - other["energie"],
-            nourriture=self["nourriture"] - other["nourriture"],
-            population=self["population"] - other["population"]
+            **{
+                key: value - other[key]
+                for key, value in self.items()
+            }
         )
+
+    def __mul__(self, scalar: float) -> Ressources:
+        ret = Ressources()
+        for key, value in self.items():
+            ret[key] = value * scalar
+        return ret
 
 #ajouter multiplier et diviser
 
