@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
     from controleur_serveur import Controleur
+    from tkinter import Canvas
 
 import tkinter as tk
 
@@ -77,3 +78,22 @@ class GestionnaireSplash(GestionnaireVue):
     def entrer(self, gestionaire: GestionnaireVue):
         self.vue.cacher()
         gestionaire.debuter()
+        
+    def update_splash(self, etat):
+        canvas: Canvas = self.vue.main_canvas
+        msg: int = self.vue.message
+        if "attente" in etat or "courante" in etat:
+            canvas.itemconfigure(msg, text="Connecté")
+            #self.btncreerpartie.config(state=DISABLED)
+        if "courante" in etat:
+            canvas.itemconfigure(msg, text="Desole - partie encours !")
+            #self.btninscrirejoueur.config(state=DISABLED)
+        elif "attente" in etat:
+            canvas.itemconfigure(msg, text="Partie en attente de joueurs !")
+            #self.btninscrirejoueur.config(state=NORMAL)
+        elif "dispo" in etat:
+            canvas.itemconfigure(msg, text="Bienvenue ! Serveur disponible")
+            #self.btninscrirejoueur.config(state=DISABLED)
+            #self.btncreerpartie.config(state=NORMAL)
+        else:
+            canvas.itemconfigure(msg, text="ERREUR - un probleme est survenu")
