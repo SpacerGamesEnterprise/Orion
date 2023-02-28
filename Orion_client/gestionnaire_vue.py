@@ -6,6 +6,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from Orion_client.vue import VueCosmos, VueHUD
+
 if TYPE_CHECKING:
     from controleur_serveur import Controleur
 
@@ -67,3 +69,16 @@ class GestionnaireSplash(GestionnaireVue):
     def entrer(self, gestionaire: GestionnaireVue):
         self.vue.cacher()
         gestionaire.debuter()
+
+class GestionnairePartie(GestionnaireVue):
+    def __init__(self, parent: GestionnaireVue, controleur: Controleur):
+        super.__init__(parent)
+        
+        self.controleur = controleur
+        self.game_frame = tk.Frame()
+        
+        self.vueHUD = VueHUD(self.game_frame,self.parent.parent.root)
+        self.vueCosmos = VueCosmos(self.game_frame,self.parent.parent.root)
+        #self.vueCosmos.main_canvas.bind("<MouseWheel>", self.vueCosmos.do_zoom)
+        #self.vueCosmos.main_canvas.bind("<MouseButton1>", self.vueCosmos.centrer_cosmos )
+    

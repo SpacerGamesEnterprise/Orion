@@ -1,4 +1,7 @@
 from abc import ABC
+from ctypes import WinDLL
+from dis import dis
+from doctest import master
 import tkinter as tk
 from tkinter.simpledialog import *
 from tkinter.messagebox import *
@@ -34,6 +37,7 @@ class Vue(ABC):
     def __init__(self, master: tk.Widget):
         self.master = master
         self.main_frame = tk.Frame(master)
+        self.url_serveur = "http://127.0.0.1:8000"
 
     def afficher(self):
         """Méthode d'affichage de la vue"""
@@ -123,7 +127,8 @@ class VueSplash(Vue):
             self.main_frame,
             textvariable=self.value_url,
             font=('Helvetica 20 bold'))
-        # self.input_url.insert(0,self.url_serveur)  # TODO: CHANGE THIS
+        self.input_url.insert(0, self.url_serveur)
+        
 
 
         self.main_canvas.place(x=0,y=0)
@@ -175,8 +180,10 @@ class VueLobby(Vue):
                 self.liste_lobby.insert(END, joueur)
                 
 class VueHUD(Vue):
-    def __init__(self, master: tk.Widget):
+    def __init__(self, master: tk.Widget,game_frame:tk.Frame):
         super().__init__(master)
+        
+        self.main_frame = game_frame
         
         self.background_width = 1200
         self.background_height = 800
@@ -199,8 +206,10 @@ class VueHUD(Vue):
         self.cadreinfo.pack(fill=BOTH)
         
 class VueCosmos(Vue):
-    def __init__(self, master: tk.Widget):
+    def __init__(self, master: tk.Widget,game_frame:tk.Frame):
         super().__init__(master)
+        
+        self.main_frame = game_frame
         
         self.background_width = 1200
         self.background_height = 80
@@ -209,11 +218,61 @@ class VueCosmos(Vue):
         
         self.modele = None #initialisé avec "initialiser_avec_modele"
         
-        self.main_canvas = tk.Canvas(self.main_frame,height=self.map_size,width=self.map_size,bg="#2f2d38")
-        self.main_canvas.pack()
+        
+        
+        
+        self.main_canvas = tk.Canvas(self.main_frame,
+            height=self.map_size,width=self.map_size,
+            bg="#2f2d38",
+            scrollregion=(0,0,self.map_size,self.map_size))
+        
+        self.scrollX = tk.Scrollbar(self.main_frame, orient=tk.HORIZONTAL)
+        self.scrollY = tk.Scrollbar(self.main_frame, orient=tk.VERTICAL)
+        
+        self.scrollX.config(command=self.main_canvas.xview)
+        self.scrollY.config(command=self.main_canvas.yview)
+        self.main_canvas.config(yscrollcommand=self.scrollX.set,
+            xscrollcommand=self.scrollY.set)
+        
 
+        
+        self.scrollX.pack(side=tk.BOTTOM,fill=tk.X)
+        self.scrollY.pack(side=tk.LEFT,fill=tk.Y)
+        self.main_canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
+        
+        
+        #TEMP FOR DEBUG
+        ##########################################################
+        #
+        #ZOOM NE FONCTIONNE PLUS ACAUSE DE CENTRER_COSMOS
+        #
+        #self.main_canvas.bind("<MouseWheel>", self.do_zoom)
+        #
+        self.main_canvas.bind("<Button-1>", self.centrer_cosmos )
+        ##########################################################
+        
+    
+    def do_zoom(self,e):
+        x = self.main_canvas.canvasx(e.x)
+        y = self.main_canvas.canvasy(e.y)
+        factor = 1.001 ** e.delta
+        self.main_canvas.scale(tk.ALL, x, y, factor, factor)   
+        
+    def centrer_cosmos(self, e):
+        # permet de defiler l'écran jusqu'à cet objet
+        x = self.main_canvas.canvasx(e.x)/4500
+        y = self.main_canvas.canvasy(e.y)/4500
+        
+        self.main_canvas.xview_moveto(x)
+        self.main_canvas.yview_moveto(y)
+        
+        
+        print(x,y)
+        print(self.scrollX.get()[0],self.scrollY.get()[0],"\n\n")
+    
     def afficher_decor(self, mod): # TODO: faire un truc plus propre
         # on cree un arriere fond de petites etoieles NPC pour le look
+        
         for i in range(len(mod.etoiles) * 50):
             x = random.randrange(int(mod.largeur))
             y = random.randrange(int(mod.hauteur))
@@ -252,23 +311,28 @@ class VueCosmos(Vue):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("800x800")
+    root.geometry("1200x800")
     root.resizable(False,False)
     game_frame = tk.Frame(root)
     
-    
-    #modele temporaire pour gameView
+    # modele temporaire pour gameView
     modele = Modele(None, [])
     
-    #vue = VueLobby(main_frame,"http://127.0.0.1:8000")
+    # vue = VueLobby(main_frame,"http://127.0.0.1:8000")
     joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
-    #vue.afficher_joueurs(joueurs)
+    # vue.afficher_joueurs(joueurs)
+    vueCosmos = VueCosmos(root,game_frame)
+    #vueHUD = VueHUD(root,game_frame)
     
     
-    vue = VueSplash()
-    vue.afficher()
-    # vueCosmos = VueCosmos()
-    # vueHUD = VueHUD()
+    
+    
+    
+    vueCosmos.initialiser_avec_modele(modele)
+    vueCosmos.afficher()
+    
+    #vueHUD.afficher()
+    
     
 
     
