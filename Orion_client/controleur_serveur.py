@@ -81,7 +81,7 @@ class Controleur():
         """La variable contenant la partie, après initialiserpartie()"""
         self.gestionnaire: GestionnaireVue = GestionnaireSplash(None, self)
         """La vue pour l'affichage et les controles du jeu"""
-
+        self.gestionnaire.debuter()
         # self.gestionnaire.root.mainloop()
         """La boucle des événements (souris, clavier, etc.)"""
 
@@ -89,7 +89,7 @@ class Controleur():
     # FONCTIONS RESERVEES - INTERDICTION DE MODIFIER SANS AUTORISATION
     # PREALABLE SAUF CHOIX DE RANDOM SEED LIGNE 94-95
 
-    def connecter_serveur(self, *_) -> None:
+    def connecter_serveur(self) -> None:
         """Le dernier avant le clic"""
         self.boucler_sur_splash()
 

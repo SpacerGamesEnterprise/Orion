@@ -4,7 +4,7 @@ avec le serveur.
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
     from controleur_serveur import Controleur
@@ -45,14 +45,23 @@ class GestionnaireSplash(GestionnaireVue):
         self.controleur = controleur
         self.vue = VueSplash(self.root)
 
+        self.vue.input_url.insert(0, self.controleur.urlserveur)
+
         self.vue.input_url.bind("<Return>", self._update_url)
         self.vue.main_canvas.tag_bind(
             self.vue.bouton_connecter, "<Button-1>",
-            self.controleur.connecter_serveur
+            self.ignore_event(self.controleur.connecter_serveur)
         )
 
-        self.vue.afficher()
-        self.vue.master.mainloop()
+        self.vue.main_canvas.tag_bind(
+            self.vue.bouton_reinitialiser_partie, "<Button-1>",
+            self.ignore_event(self.controleur.reset_partie)
+        )
+
+    def ignore_event(self, func: Callable) -> Callable:
+        def inner(self, *_):
+            func()
+        return inner
 
     def _update_url(self, _):
         url = self.vue.value_url.get()
@@ -60,6 +69,7 @@ class GestionnaireSplash(GestionnaireVue):
 
     def debuter(self):
         self.vue.afficher()
+        self.vue.master.mainloop()
 
     def quitter(self):
         self.root.destroy()
