@@ -21,22 +21,32 @@ class Ressources(dict):
         
     def __add__(self, other: Ressources) -> Ressources: 
         return Ressources(
-            metal=self["metal"] + other["metal"],
-            bois=self["bois"] + other["bois"],
-            energie=self["energie"] + other["energie"],
-            nourriture=self["nourriture"] + other["nourriture"],
-            population=self["population"] + other["population"]
-        )
-    def __sub__(self, other: Ressources) -> Ressources: 
-        return Ressources(
-            metal=self["metal"] - other["metal"],
-            bois=self["bois"] - other["bois"],
-            energie=self["energie"] - other["energie"],
-            nourriture=self["nourriture"] - other["nourriture"],
-            population=self["population"] - other["population"]
+            **{
+                key: value + other[key]
+                for key, value in self.items()
+            }
         )
 
-#ajouter multiplier et diviser
+    def __sub__(self, other: Ressources) -> Ressources:
+        return Ressources(
+            **{
+                key: value - other[key]
+                for key, value in self.items()
+            }
+        )
+
+    def __mul__(self, scalar: float) -> Ressources:
+        ret = Ressources()
+        for key, value in self.items():
+            ret[key] = value * scalar
+        return ret
+
+    def __div__(self, scalar: float) -> Ressources:
+            ret = Ressources()
+            for key, value in self.items():
+                if scalar != 0:
+                    ret[key] = value / scalar
+            return ret
 
     def has_more(self, other: Ressources) -> bool:
         for key, value in other.items():

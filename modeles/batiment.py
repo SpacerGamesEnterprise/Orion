@@ -16,10 +16,10 @@ class Batiment(ABC):
      
     def ameliorer(self, inventaire_planete: Ressources) -> Ressources:
         """Retourne l'inventaire de la planete augmente le niveau du batiment"""
-        if inventaire_planete.has_more(self.cout_construction + self.cout_construction):
-            self.cout_construction += self.cout_construction        
+        if inventaire_planete.has_more(self.cout_construction * (self.niveau + 1)):
             inventaire_planete -= self.cout_construction
             self.niveau += 1
+            self.quantites_production *= self.niveau
         return inventaire_planete      
     
     def reparer(self):

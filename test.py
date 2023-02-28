@@ -34,6 +34,7 @@ b2: Ferme = Ferme()
 
 p1.ajouter_batiment(b2)
 
+p1.inventaire_ressources = b2.ameliorer(p1.inventaire_ressources)
 
 b3: Mine = Mine()
 
