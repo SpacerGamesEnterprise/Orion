@@ -98,7 +98,7 @@ class Controleur():
         self.connecter_serveur()
 
     # a partir du splash
-    def creer_partie(self, nom: str) -> None:
+    def creer_partie(self, nom: str = None) -> None:
         if self.prochainsplash:
             # Si on est dans boucler_sur_splash, on doit supprimer
             # le prochain appel
@@ -119,7 +119,7 @@ class Controleur():
         self.gestionnaire.changer_cadre("lobby")
         self.boucler_sur_lobby()
 
-    def inscrire_joueur(self, nom: str, urljeu: str) -> None:
+    def inscrire_joueur(self, nom: str = None) -> None:
         """Inscription d'un joueur à la partie, répétition de code avec
         creer_partie
         """

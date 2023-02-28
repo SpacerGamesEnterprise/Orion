@@ -42,16 +42,37 @@ class GestionnaireSplash(GestionnaireVue):
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
         super().__init__(parent)
         self.root = tk.Tk()
+        
 
         self.controleur = controleur
         self.vue = VueSplash(self.root)
 
         self.vue.input_url.insert(0, self.controleur.urlserveur)
+        self.vue.input_url.bind(
+            "<Return>",
+            lambda _: setattr(self.controleur, 'urlserveur', self.vue.value_url.get())
+        )
 
-        self.vue.input_url.bind("<Return>", self._update_url)
+        self.vue.input_nom.insert(0, self.controleur.mon_nom)
+        self.vue.input_nom.bind(
+            "<Return>",
+            lambda _: setattr(self.controleur, 'mon_nom', self.vue.value_nom.get())
+        )
+        
+
         self.vue.main_canvas.tag_bind(
             self.vue.bouton_connecter, "<Button-1>",
             self.ignore_event(self.controleur.connecter_serveur)
+        )
+
+        self.vue.main_canvas.tag_bind(
+            self.vue.bouton_creer_partie, "<Button-1>",
+            self.ignore_event(self.controleur.creer_partie)
+        )
+
+        self.vue.main_canvas.tag_bind(
+            self.vue.bouton_inscrire_joueur, "<Button-1>",
+            self.ignore_event(self.controleur.inscrire_joueur)
         )
 
         self.vue.main_canvas.tag_bind(
@@ -59,14 +80,11 @@ class GestionnaireSplash(GestionnaireVue):
             self.ignore_event(self.controleur.reset_partie)
         )
 
+
     def ignore_event(self, func: Callable) -> Callable:
         def inner(self, *_):
             func()
         return inner
-
-    def _update_url(self, _):
-        url = self.vue.value_url.get()
-        self.controleur.urlserveur = url
 
     def debuter(self):
         self.vue.afficher()
@@ -83,7 +101,7 @@ class GestionnaireSplash(GestionnaireVue):
         canvas: Canvas = self.vue.main_canvas
         msg: int = self.vue.message
         if "attente" in etat or "courante" in etat:
-            canvas.itemconfigure(msg, text="Connecté")
+            pass
             #self.btncreerpartie.config(state=DISABLED)
         if "courante" in etat:
             canvas.itemconfigure(msg, text="Desole - partie encours !")
