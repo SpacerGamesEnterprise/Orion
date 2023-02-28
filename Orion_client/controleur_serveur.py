@@ -74,6 +74,7 @@ class Controleur():
         """
         # 127.0.0.1 pour tests,"http://votreidentifiant.pythonanywhere.com" pour web
         self.urlserveur: str = "http://127.0.0.1:8000"
+
         
         # self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
         self.modele: Modele | None = None
@@ -87,11 +88,14 @@ class Controleur():
     ##################################################################
     # FONCTIONS RESERVEES - INTERDICTION DE MODIFIER SANS AUTORISATION
     # PREALABLE SAUF CHOIX DE RANDOM SEED LIGNE 94-95
-    def connecter_serveur(self, url_serveur: str) -> None:
-        self.urlserveur = url_serveur
-        print(self.urlserveur, type(self.urlserveur))
+
+    def connecter_serveur(self, *_) -> None:
         """Le dernier avant le clic"""
         self.boucler_sur_splash()
+
+    def connecter_serveur_avec_url(self, url_serveur: str) -> None:
+        self.urlserveur = url_serveur
+        self.connecter_serveur()
 
     # a partir du splash
     def creer_partie(self, nom: str) -> None:
@@ -171,6 +175,7 @@ class Controleur():
         """Boucle de communication intiale avec le serveur pour créer ou
         s'inscrire à la partie
         """
+        
         url = self.urlserveur + "/tester_jeu"
         params = {"nom": self.mon_nom}
         mondict = self.appeler_serveur(url, params)  # TODO: Decode return type

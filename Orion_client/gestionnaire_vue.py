@@ -56,7 +56,6 @@ class GestionnaireSplash(GestionnaireVue):
 
     def _update_url(self, _):
         url = self.vue.value_url.get()
-        print(url, type(url))
         self.controleur.urlserveur = url
 
     def debuter(self):
