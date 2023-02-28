@@ -147,7 +147,7 @@ class VueLobby(Vue):
             width=self.background_width,
             height=self.background_height,
             highlightthickness=0)
-        self.background_img = self.img_format(
+        self.background_img = img_format(
             "Orion_client/graphics/menuBackground.png", (self.background_width,
                                         self.background_height)
         )

@@ -6,21 +6,24 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable
 
+
 if TYPE_CHECKING:
     from controleur_serveur import Controleur
     from tkinter import Canvas
 
 import tkinter as tk
 
-from vue import Vue, VueSplash
+from vue import Vue, VueSplash, VueLobby
 
 class GestionnaireVue(ABC):
     """Classe de base pour tous les gestionnaires de vues."""
-    def __init__(self, parent: GestionnaireVue):
+    def __init__(self, parent: GestionnaireVue, controleur: Controleur):
         self.vue: Vue
         """Vue de chaque gestionnaire."""
         self.parent = parent
         """Parent du gestionnaire (le gestionnaire qui l'a créé)."""
+        self.controleur = controleur
+        """Contrôleur de l'application."""
 
     @abstractmethod
     def debuter(self):  # TODO: Enlever ou changer le nom
@@ -40,11 +43,9 @@ class GestionnaireVue(ABC):
 class GestionnaireSplash(GestionnaireVue):
     """Gestionnaire maître de l'application."""
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
-        super().__init__(parent)
+        super().__init__(parent, controleur)
         self.root = tk.Tk()
-        
 
-        self.controleur = controleur
         self.vue = VueSplash(self.root)
 
         self.vue.input_url.insert(0, self.controleur.urlserveur)
@@ -93,9 +94,10 @@ class GestionnaireSplash(GestionnaireVue):
     def quitter(self):
         self.root.destroy()
 
-    def entrer(self, gestionaire: GestionnaireVue):
-        self.vue.cacher()
-        gestionaire.debuter()
+    def entrer(self, cls_gestionaire: type[GestionnaireVue]):
+        self.vue.destroy()
+        gestionnaire = cls_gestionaire(self, self.controleur)
+        gestionnaire.debuter()
         
     def update_splash(self, etat):
         canvas: Canvas = self.vue.main_canvas
@@ -115,3 +117,17 @@ class GestionnaireSplash(GestionnaireVue):
             #self.btncreerpartie.config(state=NORMAL)
         else:
             canvas.itemconfigure(msg, text="ERREUR - un probleme est survenu")
+
+
+class GestionnaireLobby(GestionnaireVue):
+    """Gestionnaire du lobby de l'application."""
+
+    def __init__(self, parent: GestionnaireVue, controleur: Controleur):
+        super().__init__(parent, controleur)
+        self.vue = VueLobby(parent.vue.main_frame)
+
+    def debuter(self):
+        self.vue.afficher()
+
+    def quitter(self):
+        raise NotImplementedError

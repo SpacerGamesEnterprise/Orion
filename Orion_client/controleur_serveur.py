@@ -11,7 +11,11 @@ import urllib.request
 
 from orion_modele import *
 from orion_vue import *
-from gestionnaire_vue import GestionnaireVue, GestionnaireSplash
+from gestionnaire_vue import (
+    GestionnaireVue,
+    GestionnaireSplash,
+    GestionnaireLobby,
+)
 
 # TODO: Type alias for server status
 # TODO: Change lists and tuples to sequence
@@ -116,7 +120,7 @@ class Controleur():
         """on est le createur"""
         self.gestionnaire.root.title("je suis " + self.mon_nom)
         # On passe au lobby pour attendre les autres joueurs
-        self.gestionnaire.changer_cadre("lobby")
+        self.gestionnaire.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     def inscrire_joueur(self, nom: str = None) -> None:
