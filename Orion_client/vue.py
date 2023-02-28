@@ -109,12 +109,19 @@ class VueSplash(Vue):
         #Essaie pour lier les boutons avec les canvas
         #self.bouton_creer_partie = tk.Button(text=self.bouton_creer_partie_message, width=self.background_width, height=self.background_height,
         #    bg="blue", command=v.creer_partie)
+        
+        
+        self.value_nom = tk.StringVar()
+        self.value_url = tk.StringVar()
+        
         self.input_nom = tk.Entry(
             self.main_frame,
+            textvariable=self.value_nom,
             font=('Helvetica 20 bold'))
 
         self.input_url = tk.Entry(
             self.main_frame,
+            textvariable=self.value_url,
             font=('Helvetica 20 bold'))
         # self.input_url.insert(0,self.url_serveur)  # TODO: CHANGE THIS
 
