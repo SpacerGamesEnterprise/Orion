@@ -1,9 +1,6 @@
-from abc import ABC
-import tkinter as tk
 from tkinter.simpledialog import *
 from tkinter.messagebox import *
 from helper import Helper as hlp
-from PIL import Image, ImageTk
 import math
 
 #import temporaire
@@ -12,12 +9,21 @@ from orion_modele import *
 import random
 
 
+# Actual imports from here
+from abc import ABC
+
+import os.path
+
+import tkinter as tk
+from PIL import Image, ImageTk
+
+
 def img_format(file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
     img = Image.open(file)
     img = img.resize(dimensions)
     img = img.convert('RGBA')
     data = img.getdata()
-    
+
     new_data = []
     for item in data:
         if item[0] == 255 and item[1] == 255 and item[2] == 0:  # finding yellow colour
@@ -25,10 +31,13 @@ def img_format(file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
             new_data.append((255, 255, 255, 0))
         else:
             new_data.append(item)
-    
+
     img.putdata(new_data)
     return ImageTk.PhotoImage(img)
 
+def getimg(name: str) -> str:
+    """Retourne le liens vers l'image demandée"""
+    return os.path.join(os.path.curdir, "graphics", name)
 
 class Vue(ABC):
     def __init__(self, master: tk.Widget):
@@ -63,8 +72,8 @@ class VueSplash(Vue):
             height=self.background_height,
             highlightthickness=0)
         self.background_img = img_format(
-            "Orion_client/graphics/menuBackground.png", (self.background_width,
-                                        self.background_height)
+            getimg('menuBackground.png'),
+            (self.background_width, self.background_height)
         )
         self.background = self.main_canvas.create_image(
             self.background_width/2, self.background_height/2,
@@ -109,11 +118,11 @@ class VueSplash(Vue):
         #Essaie pour lier les boutons avec les canvas
         #self.bouton_creer_partie = tk.Button(text=self.bouton_creer_partie_message, width=self.background_width, height=self.background_height,
         #    bg="blue", command=v.creer_partie)
-        
-        
+
+
         self.value_nom = tk.StringVar()
         self.value_url = tk.StringVar()
-        
+
         self.input_nom = tk.Entry(
             self.main_frame,
             textvariable=self.value_nom,
@@ -133,8 +142,7 @@ class VueSplash(Vue):
         
         self.input_url.place(x=self.background_width/2-200,y=self.background_height/4+100,
                              width=400,height=50)
-        
-        
+
 
 class VueLobby(Vue):
     def __init__(self, master: tk.Widget):
@@ -148,8 +156,8 @@ class VueLobby(Vue):
             height=self.background_height,
             highlightthickness=0)
         self.background_img = img_format(
-            "Orion_client/graphics/menuBackground.png", (self.background_width,
-                                        self.background_height)
+            getimg('menuBackground.png'),
+            (self.background_width, self.background_height)
         )
         self.background = self.main_canvas.create_image(
             self.background_width/2, self.background_height/2,
@@ -173,42 +181,46 @@ class VueLobby(Vue):
     def afficher_joueurs(self, joueurs : list[str]):
            for joueur in joueurs:
                 self.liste_lobby.insert(END, joueur)
-                
+
+
 class VueHUD(Vue):
     def __init__(self, master: tk.Widget):
         super().__init__(master)
-        
+
         self.background_width = 1200
         self.background_height = 800
-        
+
         self.taille_minimap = 240
         self.ecart_minimap = 25
-        
+
         root.geometry(f"{self.background_width}x{self.background_height}")
-        
-        self.minimap = tk.Canvas(self.main_frame, width=self.taille_minimap, height=self.taille_minimap,
-                                      bg="#525252")
+
+        self.minimap = tk.Canvas(
+            self.main_frame, width=self.taille_minimap,
+            height=self.taille_minimap, bg="#525252"
+        )
         #self.canevas_minimap.bind("<Button>", self.positionner_minicanevas)
         self.minimap.place(x=(self.background_width-self.taille_minimap-self.ecart_minimap),y=self.ecart_minimap)
         self.cadreoutils_h = tk.Frame(self.main_frame, width=75, height=75, bg="darkgrey", highlightthickness="3",highlightbackground="#525252")
         self.cadreoutils_h.place(x=0,rely=0.9,relheight=0.1,relwidth=1)
         self.cadreoutils_v = tk.Frame(self.main_frame, width=200, height=200, bg="darkgrey", highlightthickness="3",highlightbackground="#525252")
         self.cadreoutils_v.place(x=0,y=0,relheight=0.9,relwidth=0.2)
-        
+
         self.cadreinfo = tk.Frame(self.cadreoutils_v, width=200, height=200, bg="#525252", highlightthickness="3",highlightbackground="darkgrey")
         self.cadreinfo.pack(fill=BOTH)
-        
+
+
 class VueCosmos(Vue):
     def __init__(self, master: tk.Widget):
         super().__init__(master)
-        
+
         self.background_width = 1200
         self.background_height = 80
         self.map_size = 9000
         self.zoom = 2
-        
+
         self.modele = None #initialisé avec "initialiser_avec_modele"
-        
+
         self.main_canvas = tk.Canvas(self.main_frame,height=self.map_size,width=self.map_size,bg="#2f2d38")
         self.main_canvas.pack()
 
@@ -239,7 +251,7 @@ class VueCosmos(Vue):
                 #self.canevas_minimap.create_rectangle(minix, miniy, minix + 3, miniy + 3,
                 #                                      fill=mod.joueurs[i].couleur,
                 #                                      tags=(j.proprietaire, str(j.id), "Etoile"))
-                
+
     def initialiser_avec_modele(self, modele):
         #self.mon_nom = self.parent.mon_nom
         self.modele = modele
@@ -255,25 +267,24 @@ if __name__ == "__main__":
     root.geometry("800x800")
     root.resizable(False,False)
     game_frame = tk.Frame(root)
-    
-    
+
+
     #modele temporaire pour gameView
     modele = Modele(None, [])
-    
+
     #vue = VueLobby(main_frame,"http://127.0.0.1:8000")
     joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
     #vue.afficher_joueurs(joueurs)
-    
-    
+
+
     vue = VueSplash()
     vue.afficher()
     # vueCosmos = VueCosmos()
     # vueHUD = VueHUD()
-    
 
-    
+
     # vueCosmos.initialiser_avec_modele(modele)
     # vueCosmos.afficher_decor(modele)
-    
+
     # game_frame.place(relx=0, rely=0,relheight=1,relwidth=1)
     root.mainloop()
