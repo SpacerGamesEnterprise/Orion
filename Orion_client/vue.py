@@ -177,7 +177,7 @@ class VueLobby(Vue):
 
     def afficher_joueurs(self, joueurs : list[str]):
            for joueur in joueurs:
-                self.liste_lobby.insert(END, joueur)
+                self.liste_lobby.insert(tk.END, joueur)
                 
 class VueHUD(Vue):
     def __init__(self, master: tk.Widget,game_frame:tk.Frame):
@@ -203,7 +203,7 @@ class VueHUD(Vue):
         self.cadreoutils_v.place(x=0,y=0,relheight=0.9,relwidth=0.2)
         
         self.cadreinfo = tk.Frame(self.cadreoutils_v, width=200, height=200, bg="#525252", highlightthickness="3",highlightbackground="darkgrey")
-        self.cadreinfo.pack(fill=BOTH)
+        self.cadreinfo.pack(fill=tk.BOTH)
         
 class VueCosmos(Vue):
     def __init__(self, master: tk.Widget,game_frame:tk.Frame):
@@ -213,7 +213,7 @@ class VueCosmos(Vue):
         
         self.background_width = 1200
         self.background_height = 80
-        self.map_size = 9000
+        self.map_size = 9000#taille du canvas du cosmos
         self.zoom = 2
         
         self.modele = None #initialisé avec "initialiser_avec_modele"
@@ -246,30 +246,53 @@ class VueCosmos(Vue):
         #
         #ZOOM NE FONCTIONNE PLUS ACAUSE DE CENTRER_COSMOS
         #
-        #self.main_canvas.bind("<MouseWheel>", self.do_zoom)
+        self.main_canvas.bind("<MouseWheel>", self.do_zoom)
         #
-        self.main_canvas.bind("<Button-1>", self.centrer_cosmos )
+        self.main_canvas.bind("<Button-1>", self.centrer_clic )
         ##########################################################
         
     
     def do_zoom(self,e):
+
+        initial_map_size = self.map_size
         x = self.main_canvas.canvasx(e.x)
         y = self.main_canvas.canvasy(e.y)
         factor = 1.001 ** e.delta
-        self.main_canvas.scale(tk.ALL, x, y, factor, factor)   
+        self.map_size = self.map_size * factor
+        zoom_valide=False
+        if(self.map_size>15000):self.map_size=15000
+        elif(self.map_size<5000):self.map_size=5000
+        else: zoom_valide = True
+            
         
-    def centrer_cosmos(self, e):
+        if(zoom_valide):self.main_canvas.scale(tk.ALL, x, y, factor, factor) 
+        else: self.map_size = initial_map_size 
+        self.main_canvas.config(scrollregion=(0,0,factor,factor)) 
+        self.main_canvas.config(scrollregion=(0,0,self.map_size,self.map_size))
+        print(self.map_size)
+        
+    def centrer_clic(self, e):
         # permet de defiler l'écran jusqu'à cet objet
-        x = self.main_canvas.canvasx(e.x)/4500
-        y = self.main_canvas.canvasy(e.y)/4500
-        
-        self.main_canvas.xview_moveto(x)
-        self.main_canvas.yview_moveto(y)
-        
+        x = self.main_canvas.canvasx(e.x)
+        y = self.main_canvas.canvasy(e.y)
+    
+        x1 = (self.main_canvas.winfo_width() / 2) + (self.main_canvas.winfo_width() / 10)
+        y1 = (self.main_canvas.winfo_height() / 2) - (self.main_canvas.winfo_height() / 20)
+
+        pctx = (x - x1) / self.map_size
+        pcty = (y - y1) / self.map_size
+
+        self.centrer_canvas(pctx,pcty)
         
         print(x,y)
         print(self.scrollX.get()[0],self.scrollY.get()[0],"\n\n")
     
+    def centrer_canvas(self,x,y):
+
+        self.main_canvas.xview_moveto(x)
+        self.main_canvas.yview_moveto(y)
+
+
     def afficher_decor(self, mod): # TODO: faire un truc plus propre
         # on cree un arriere fond de petites etoieles NPC pour le look
         
@@ -322,7 +345,7 @@ if __name__ == "__main__":
     joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
     # vue.afficher_joueurs(joueurs)
     vueCosmos = VueCosmos(root,game_frame)
-    #vueHUD = VueHUD(root,game_frame)
+    vueHUD = VueHUD(root,game_frame)
     
     
     
@@ -331,7 +354,7 @@ if __name__ == "__main__":
     vueCosmos.initialiser_avec_modele(modele)
     vueCosmos.afficher()
     
-    #vueHUD.afficher()
+    vueHUD.afficher()
     
     
 
