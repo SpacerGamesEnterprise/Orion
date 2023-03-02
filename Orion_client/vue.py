@@ -196,6 +196,9 @@ class VueHUD(Vue):
         self.button_size = 50
         self.minimap_size = 240
         self.ecart_minimap = 25
+        self.cursor_height = 20
+        self.cursor_width = 28
+
         
         if(master!=None):
             master.geometry(f"{self.background_width}x{self.background_height}")
@@ -223,6 +226,12 @@ class VueHUD(Vue):
         self.minimap_background = self.minimap.create_image(
             self.minimap_size/2,self.minimap_size/2,
             image = self.minimap_background_img,
+        )
+
+        self.minimap_cursor = self.minimap.create_rectangle(
+            0,0,
+            self.cursor_width,self.cursor_height,
+            width=2,outline="#525252"
         )
         self.cadre_outils_h = tk.Frame(
             self.main_frame,
@@ -270,7 +279,14 @@ class VueHUD(Vue):
                     tags=(j.proprietaire, str(j.id), "Etoile")
                 )
     
-     
+    def mini_clic(self,e):
+        self.minimap.delete(self.minimap_cursor)
+        self.minimap_cursor = self.minimap.create_rectangle(
+            e.x-self.cursor_width/2,e.y - self.cursor_height/2,
+            e.x+self.cursor_width/2,e.y + self.cursor_height/2,
+            width=2,outline="#525252"
+        )
+    
     def cacher_mini(self,e):
         self.minimap.place_forget()
         self.minimap_button.place(

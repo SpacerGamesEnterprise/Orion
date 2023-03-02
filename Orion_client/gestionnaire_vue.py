@@ -154,8 +154,12 @@ class GestionnairePartie(GestionnaireVue):
         self.vueCosmos.canvas_cosmos.bind("<Button-1>", self.vueCosmos.centrer_clic)
         self.vueHUD.minimap.bind("<Button-3>", self.vueHUD.cacher_mini)
         self.vueHUD.minimap_button.bind("<Button-1>",self.vueHUD.montrer_mini)
-        self.vueHUD.minimap.bind("<Button-1>", self.vueCosmos.mini_clic)
-
+        self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
+        self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
+        
+    def mini_clic(self,e):
+        self.vueCosmos.mini_clic(e)
+        self.vueHUD.mini_clic(e)
         
     def debuter(self):
         self.vueCosmos.afficher_decor()
