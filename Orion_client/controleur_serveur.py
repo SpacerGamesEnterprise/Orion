@@ -11,7 +11,7 @@ import urllib.request
 
 from orion_modele import *
 from orion_vue import *
-from gestionnaire_vue import GestionnaireVue, GestionnaireSplash
+from gestionnaire_vue import GestionnaireVue, GestionnairePartie,GestionnaireSplash
 
 # TODO: Type alias for server status
 # TODO: Change lists and tuples to sequence
@@ -79,10 +79,11 @@ class Controleur():
         # self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
         self.modele: Modele | None = None
         """La variable contenant la partie, après initialiserpartie()"""
-        self.gestionnaire: GestionnaireVue = GestionnaireSplash(None, self)
+        #self.gestionnaire_splash: GestionnaireVue = GestionnaireSplash(None,self)
+        self.gestionnaire: GestionnaireVue = GestionnairePartie(None, self)
         """La vue pour l'affichage et les controles du jeu"""
-
-        # self.gestionnaire.root.mainloop()
+        self.gestionnaire.debuter()
+        #self.gestionnaire.root.mainloop()
         """La boucle des événements (souris, clavier, etc.)"""
 
     ##################################################################
