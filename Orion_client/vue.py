@@ -315,7 +315,7 @@ class VueCosmos(Vue):
         self.color_planet_diameter = 75
 
         self.map_size = 9000#taille du canvas du cosmos
-        self.max_map_size = 8000
+        self.max_map_size = 9000
         self.min_map_size = 2000
 
 
@@ -342,7 +342,7 @@ class VueCosmos(Vue):
         )
         self.background_image = img_resize(
             "Orion_client/graphics/gameBackground.png",
-            (self.max_map_size+2000,self.max_map_size+3000)
+            (self.max_map_size,self.max_map_size)
         )
 
         self.background = self.canvas_cosmos.create_image(
