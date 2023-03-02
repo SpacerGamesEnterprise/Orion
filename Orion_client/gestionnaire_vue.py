@@ -131,7 +131,7 @@ class GestionnaireLobby(GestionnaireVue):
         self.vue.afficher()
 
     def quitter(self):
-        raise NotImplementedError       
+        raise NotImplementedError
     
 class GestionnairePartie(GestionnaireVue):
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):

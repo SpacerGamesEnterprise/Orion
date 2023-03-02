@@ -79,8 +79,8 @@ class Controleur():
         # self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
         self.modele: Modele | None = None
         """La variable contenant la partie, après initialiserpartie()"""
-        #self.gestionnaire_splash: GestionnaireVue = GestionnaireSplash(None,self)
-        self.gestionnaire: GestionnaireVue = GestionnairePartie(None, self)
+        self.gestionnaire_splash: GestionnaireVue = GestionnaireSplash(None,self)
+        #self.gestionnaire: GestionnaireVue = GestionnairePartie(None, self)
         """La vue pour l'affichage et les controles du jeu"""
         self.gestionnaire.debuter()
         #self.gestionnaire.root.mainloop()
