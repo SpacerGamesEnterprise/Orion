@@ -194,14 +194,15 @@ class Controleur():
         url = self.urlserveur + "/boucler_sur_lobby"
         params = {"nom": self.mon_nom}
         mondict: list[tuple[str, int]] | tuple[Literal["courante"], tuple[int]] = self.appeler_serveur(url, params)
-        print(f"{mondict = }")
 
         if "courante" in mondict[0]:  # courante, la partie doit etre initialiser
             self.initialiser_partie(mondict)
         else:
             self.joueurs = mondict
             self.gestionnaire.update_lobby(mondict)
-            self.gestionnaire.root.after(self.maindelai, self.boucler_sur_lobby)
+            self.gestionnaire.root.after(
+                self.maindelai, self.boucler_sur_lobby
+            )
             
     # BOUCLE PRINCIPALE
     def boucler_sur_jeu(self) -> None:

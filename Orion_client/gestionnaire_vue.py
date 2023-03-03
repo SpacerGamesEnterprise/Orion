@@ -22,6 +22,9 @@ class GestionnaireVue(ABC):
         """Vue de chaque gestionnaire."""
         self.parent = parent
         """Parent du gestionnaire (le gestionnaire qui l'a créé)."""
+        if self.parent:
+            self.root = self.parent.root
+        
         self.controleur = controleur
         """Contrôleur de l'application."""
 
@@ -126,6 +129,16 @@ class GestionnaireLobby(GestionnaireVue):
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
         super().__init__(parent, controleur)
         self.vue = VueLobby(parent.vue.main_frame)
+        
+        self.vue.main_canvas.tag_bind(
+                self.vue.bouton_commencer, "<Button-1>",
+                self.ignore_event(self.controleur.lancer_partie)
+            )
+
+    def ignore_event(self, func: Callable) -> Callable:
+        def inner(self, *_):
+            func()
+        return inner
 
     def debuter(self):
         self.vue.afficher()
@@ -134,9 +147,9 @@ class GestionnaireLobby(GestionnaireVue):
         raise NotImplementedError
     
     def update_lobby(self, dico):
-        self.listelobby.delete(0, END)
+        self.vue.liste_lobby.delete(0, tk.END)
         for i in dico:
-            self.listelobby.insert(END, i[0])
-        if self.parent.joueur_createur:
-            #self.btnlancerpartie.config(state=NORMAL)
+            self.vue.liste_lobby.insert(tk.END, i[0])
+        if self.controleur.joueur_createur:
+            #self.btnlancerpartie.config(state=NORMAL) #TODO Faire que le joueur créateur est le seul a commencer une partie
             pass

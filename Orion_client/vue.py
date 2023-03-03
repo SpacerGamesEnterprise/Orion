@@ -162,11 +162,16 @@ class VueLobby(Vue):
         self.background = self.main_canvas.create_image(
             self.background_width/2, self.background_height/2,
             image=self.background_img)
-        self.bouton_connecter = self.main_canvas.create_rectangle(
+        self.bouton_commencer = self.main_canvas.create_rectangle(
             self.background_width/2-100, self.background_height-200,
             self.background_width/2+100, self.background_height-150,
             fill="black")
-
+        
+        self.text_commencer = self.main_canvas.create_text(
+            self.background_width/2-15, self.background_height-175,
+            text="Commencer Partie", font=('Helvetica 10 bold'),fill="white"
+        )
+        
         self.url = self.main_canvas.create_text(
             self.background_width*0.5,self.background_height*0.23,
             text="Joueurs", font=('Helvetica 15 bold'),fill="white" 
