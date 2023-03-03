@@ -94,10 +94,11 @@ class GestionnaireSplash(GestionnaireVue):
     def quitter(self):
         self.root.destroy()
 
-    def entrer(self, cls_gestionaire: type[GestionnaireVue]):
+    def entrer(self, cls_gestionaire: type[GestionnaireVue]) -> GestionnaireVue:
         self.vue.destroy()
         gestionnaire = cls_gestionaire(self, self.controleur)
         gestionnaire.debuter()
+        return gestionnaire
         
     def update_splash(self, etat):
         canvas: Canvas = self.vue.main_canvas
@@ -131,3 +132,11 @@ class GestionnaireLobby(GestionnaireVue):
 
     def quitter(self):
         raise NotImplementedError
+    
+    def update_lobby(self, dico):
+        self.listelobby.delete(0, END)
+        for i in dico:
+            self.listelobby.insert(END, i[0])
+        if self.parent.joueur_createur:
+            #self.btnlancerpartie.config(state=NORMAL)
+            pass

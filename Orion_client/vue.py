@@ -37,7 +37,7 @@ def img_format(file: str, dimensions: tuple[int, int]) -> tk.PhotoImage:
 
 def getimg(name: str) -> str:
     """Retourne le liens vers l'image demandée"""
-    return os.path.join(os.path.curdir, "graphics", name)
+    return os.path.join(os.path.dirname(__file__), "graphics", name)
 
 class Vue(ABC):
     def __init__(self, master: tk.Widget):
@@ -169,7 +169,7 @@ class VueLobby(Vue):
 
         self.url = self.main_canvas.create_text(
             self.background_width*0.5,self.background_height*0.23,
-            text=self.url_serveur, font=('Helvetica 15 bold'),fill="white"  # TODO: CHANGE URL
+            text="Joueurs", font=('Helvetica 15 bold'),fill="white" 
         )
 
         self.liste_lobby = tk.Listbox(self.main_frame,borderwidth=0)

@@ -120,7 +120,7 @@ class Controleur():
         """on est le createur"""
         self.gestionnaire.root.title("je suis " + self.mon_nom)
         # On passe au lobby pour attendre les autres joueurs
-        self.gestionnaire.entrer(GestionnaireLobby)
+        self.gestionnaire = self.gestionnaire.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     def inscrire_joueur(self, nom: str = None) -> None:
@@ -139,7 +139,7 @@ class Controleur():
         reptext = self.appeler_serveur(url, params)
 
         self.gestionnaire.root.title("je suis " + self.mon_nom)
-        self.gestionnaire.changer_cadre("lobby")
+        self.gestionnaire = self.gestionnaire.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     # a partir du lobby, le createur avertit le serveur de changer l'etat pour courant
@@ -202,7 +202,7 @@ class Controleur():
             self.joueurs = mondict
             self.gestionnaire.update_lobby(mondict)
             self.gestionnaire.root.after(self.maindelai, self.boucler_sur_lobby)
-
+            
     # BOUCLE PRINCIPALE
     def boucler_sur_jeu(self) -> None:
         """Boucle principale du jeu"""
