@@ -267,7 +267,7 @@ class Vue():
     def inscrire_joueur(self):
         nom = self.nomsplash.get()
         urljeu = self.urlsplash.get()
-        self.parent.inscrire_joueur(nom, urljeu)
+        self.parent.inscrire_joueur(nom, urljeu)  # NOTE: urljeu enlevé
 
     def lancer_partie(self):
         self.parent.lancer_partie()
