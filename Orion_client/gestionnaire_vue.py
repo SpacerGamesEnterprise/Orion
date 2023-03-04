@@ -130,7 +130,7 @@ class GestionnaireLobby(GestionnaireVue):
 
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
         super().__init__(parent, controleur)
-        self.vue = VueLobby(parent.vue.main_frame)
+        self.vue = VueLobby(self.root)
         
         self.vue.main_canvas.tag_bind(
                 self.vue.bouton_commencer, "<Button-1>",
@@ -142,6 +142,12 @@ class GestionnaireLobby(GestionnaireVue):
             func()
         return inner
 
+    def entrer(self, cls_gestionaire: type[GestionnaireVue])->GestionnaireVue:
+        self.vue.destroy()
+        gestionnaire = cls_gestionaire(self, self.controleur)
+        gestionnaire.debuter()
+        return gestionnaire
+
     def debuter(self):
         self.vue.afficher()
 
@@ -149,7 +155,7 @@ class GestionnaireLobby(GestionnaireVue):
         raise NotImplementedError
     
     def update_lobby(self,dico):
-        
+
         self.vue.update_lobby(dico)
 
 
@@ -161,14 +167,14 @@ class GestionnairePartie(GestionnaireVue):
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
         super().__init__(parent,controleur)
 
-        self.root  = tk.Tk()
         self.root.resizable(False,False)
+
         self.controleur = controleur
         self.game_frame = tk.Frame(self.root)
         self.modele = Modele(None, [])
 
 
-        self.vueCosmos = VueCosmos(parent, self.game_frame,self.modele)
+        self.vueCosmos = VueCosmos(self.root, self.game_frame,self.modele)
         self.vueHUD = VueHUD(self.root, self.game_frame,self.modele)
         
         self.root.geometry(f"{self.vueHUD.background_width}x{self.vueHUD.background_height}")

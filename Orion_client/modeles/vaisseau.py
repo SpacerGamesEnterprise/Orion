@@ -1,8 +1,8 @@
 from abc import ABC
 import random
-from Orion_client.id import get_prochain_id
+from id import get_prochain_id
 from modeles.ressources import Ressources
-from Orion_client.helper import Helper as hlp
+from helper import Helper as hlp
 from modeles.position import Point
 
 class Vaisseau(ABC):  

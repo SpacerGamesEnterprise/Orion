@@ -15,6 +15,7 @@ from gestionnaire_vue import (
     GestionnaireVue,
     GestionnaireSplash,
     GestionnaireLobby,
+    GestionnairePartie
 )
 
 # TODO: Type alias for server status
@@ -118,7 +119,7 @@ class Controleur():
         """on est le createur"""
         self.gestionnaire.root.title("je suis " + self.mon_nom)
         # On passe au lobby pour attendre les autres joueurs
-        self.gestionnaire = self.gestionnaire.entrer(GestionnaireLobby)
+        self.gestionnaire_lobby = self.gestionnaire.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     def inscrire_joueur(self, nom: str = None) -> None:
@@ -163,10 +164,9 @@ class Controleur():
 
         # On crée une partie pour les joueurs, qu'on conserve comme modèle
         self.modele = Modele(self, listejoueurs)
-
         # On fournit le à la vue et la met à jour
         # On change le cadre la fenêtre pour passer dans l'interface de jeu
-        #self.gestionnaire_lobby = self.gestionnaire.entrer(GestionnaireLobby)
+        self.gestionnaire_partie = self.gestionnaire_lobby.entrer(GestionnairePartie)
         # On lance la boucle de jeu
         self.boucler_sur_jeu()
 
@@ -233,7 +233,7 @@ class Controleur():
         if self.onjoue:
             # envoyer les messages au modele et a la vue de faire leur job
             self.modele.jouer_prochain_coup(self.cadrejeu)
-            self.gestionnaire.afficher_jeu()
+            self.gestionnaire_partie.afficher_jeu()
         else:
             self.cadrejeu -= 1
             self.onjoue = 1

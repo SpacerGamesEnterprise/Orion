@@ -119,8 +119,7 @@ class Joueur():
         self.etoilescontrolees = [etoilemere]
         self.flotte = {"Vaisseau": {},
                        "Cargo": {}}
-        self.actions = {"creervaisseau": self.creervaisseau,
-                        "ciblerflotte": self.ciblerflotte}
+        self.actions = {"ciblerflotte": self.ciblerflotte}
 
     # def creervaisseau(self, params):  //A voir pour création vaisseau
     #     type_vaisseau = params[0]
@@ -231,7 +230,7 @@ class Modele():
         for i in range(self.nb_etoiles):
             x = random.randrange(self.largeur - (2 * bordure)) + bordure
             y = random.randrange(self.hauteur - (2 * bordure)) + bordure
-            self.etoiles.append(Planete(self, x, y))
+            self.etoiles.append(Planete(x, y))
         np = len(joueurs) + ias
         etoile_occupee = []
         while np:
@@ -252,7 +251,7 @@ class Modele():
             for e in range(5):
                 x1 = random.randrange(x - dist, x + dist)
                 y1 = random.randrange(y - dist, y + dist)
-                self.etoiles.append(Planete(self, x1, y1))
+                self.etoiles.append(Planete(x1, y1))
 
         # IA- creation des ias
         couleursia = ["orange", "green", "cyan",

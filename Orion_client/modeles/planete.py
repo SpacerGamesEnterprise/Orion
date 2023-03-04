@@ -1,7 +1,7 @@
 import random
 from modeles.batiment import Batiment
 from modeles.ressources import Ressources
-from Orion_client.id import get_prochain_id
+from id import get_prochain_id
 
 
 class Planete():
