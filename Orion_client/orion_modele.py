@@ -3,8 +3,8 @@
 
 import ast
 import random
-from modeles.planete import Planete
 from id import get_prochain_id
+from modeles.planete import Planete
 
 class Porte_de_vers():
     def __init__(self, parent, x, y, couleur, taille):

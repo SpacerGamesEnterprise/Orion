@@ -1,72 +1,19 @@
 # -*- coding: utf-8 -*-
 
 
-import sqlite3
-import os.path
-import random
-
 from flask import Flask, request, json
 from werkzeug.wrappers import Response
+import random
+import sqlite3
 
 app = Flask(__name__)
 
 app.secret_key = "qwerasdf1234"
 
 class Dbman():
-    """Gère la communication avec la base de données."""
-
-    database: str = os.path.join(
-        os.path.dirname(__file__),
-        "RTS_serveur_DB.db",
-    )
-
     def __init__(self):
-        self.conn = sqlite3.connect(Dbman.database)
+        self.conn = sqlite3.connect("RTS_serveur_DB.db")
         self.curs = self.conn.cursor()
-        self.createdb()
-
-    def createdb(self):
-        """Crée la base de données si elle n'existe pas."""
-        self.curs.execute("""
-            CREATE TABLE IF NOT EXISTS actionsenattente (
-                nom TEXT,
-                cadrejeu INTEGER,
-                "action" TEXT
-            )
-        """)
-
-        self.curs.execute("""
-            CREATE TABLE IF NOT EXISTS cadrecourant (
-                cadrecourant INTEGER
-            )
-        """)
-
-        self.curs.execute("""
-            CREATE TABLE IF NOT EXISTS initaleatoire (
-                initaleatoire DEFAULT (2020)
-            )
-        """)
-
-        self.curs.execute("""
-            CREATE TABLE IF NOT EXISTS joueurs (
-                nom TEXT PRIMARY KEY UNIQUE,
-                derniercadrejeu NUMERIC DEFAULT (0)
-            )
-        """)
-
-        self.curs.execute("""
-            CREATE TABLE IF NOT EXISTS nbrIA (
-                nbrIA INT DEFAULT (0)
-            )
-        """)
-
-        self.curs.execute("""
-            CREATE TABLE IF NOT EXISTS partiecourante (
-                etat TEXT DEFAULT dispo
-            )
-        """)
-
-        self.conn.commit()
 
     def setpartiecourante(self, chose):
         self.vidertable("partiecourante")
@@ -112,8 +59,6 @@ class Dbman():
         tables = ["partiecourante", "joueurs", "cadrecourant", "actionsenattente", "initaleatoire", "nbrIA"]
         for i in tables:
             self.vidertable(i)
-
-        # Maybe drop and call createdb() instead?
 
         self.curs.execute("Insert into partiecourante (etat) VALUES(?);", ("dispo",))
         self.curs.execute("Insert into cadrecourant (cadrecourant) VALUES(?);", (0,))

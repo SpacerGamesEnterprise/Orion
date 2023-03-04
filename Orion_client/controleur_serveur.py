@@ -83,7 +83,7 @@ class Controleur():
         # self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
         self.modele: Modele | None = None
         """La variable contenant la partie, après initialiserpartie()"""
-        self.gestionnaire_splash: GestionnaireVue = GestionnaireSplash(None,self)
+        self.gestionnaire: GestionnaireVue = GestionnaireSplash(None,self)
         #self.gestionnaire: GestionnaireVue = GestionnairePartie(None, self)
         """La vue pour l'affichage et les controles du jeu"""
         self.gestionnaire.debuter()
@@ -98,10 +98,6 @@ class Controleur():
     def connecter_serveur(self) -> None:
         """Le dernier avant le clic"""
         self.boucler_sur_splash()
-
-    def connecter_serveur_avec_url(self, url_serveur: str) -> None:
-        self.urlserveur = url_serveur
-        self.connecter_serveur()
 
     # a partir du splash
     def creer_partie(self, nom: str = None) -> None:
@@ -141,7 +137,7 @@ class Controleur():
         reptext = self.appeler_serveur(url, params)
 
         self.gestionnaire.root.title("je suis " + self.mon_nom)
-        self.gestionnaire = self.gestionnaire.entrer(GestionnaireLobby)
+        self.gestionnaire_lobby = self.gestionnaire.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     # a partir du lobby, le createur avertit le serveur de changer l'etat pour courant
@@ -169,9 +165,8 @@ class Controleur():
         self.modele = Modele(self, listejoueurs)
 
         # On fournit le à la vue et la met à jour
-        self.gestionnaire.initialiser_avec_modele(self.modele)
         # On change le cadre la fenêtre pour passer dans l'interface de jeu
-        self.gestionnaire.changer_cadre("partie")
+        #self.gestionnaire_lobby = self.gestionnaire.entrer(GestionnaireLobby)
         # On lance la boucle de jeu
         self.boucler_sur_jeu()
 
@@ -185,6 +180,7 @@ class Controleur():
         url = self.urlserveur + "/tester_jeu"
         params = {"nom": self.mon_nom}
         mondict = self.appeler_serveur(url, params)  # TODO: Decode return type
+        
         if mondict:
             self.gestionnaire.update_splash(mondict[0])
         self.prochainsplash = self.gestionnaire.root.after(
@@ -201,7 +197,7 @@ class Controleur():
             self.initialiser_partie(mondict)
         else:
             self.joueurs = mondict
-            self.gestionnaire.update_lobby(mondict)
+            self.gestionnaire_lobby.update_lobby(mondict)
             self.gestionnaire.root.after(
                 self.maindelai, self.boucler_sur_lobby
             )

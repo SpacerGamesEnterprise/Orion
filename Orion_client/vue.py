@@ -145,7 +145,6 @@ class VueSplash(Vue):
             self.main_frame,
             textvariable=self.value_url,
             font=('Helvetica 20 bold'))
-        self.input_url.insert(0, self.url_serveur)
         
 
 
@@ -168,12 +167,8 @@ class VueLobby(Vue):
             width=self.background_width,
             height=self.background_height,
             highlightthickness=0)
-        self.background_img = self.img_format(
-            "Orion_client/graphics/menuBackground.png", 
-        )
-        
         self.background_img = img_resize(
-            self.background_img,
+            "Orion_client/graphics/menuBackground.png",
             (2000,2000)
         )
 
@@ -200,6 +195,13 @@ class VueLobby(Vue):
         self.main_canvas.place(x=0,y=0)
 
         self.liste_lobby.place(relx=0.35,rely=0.25,relheight=0.4,relwidth=0.3)
+
+    def update_lobby(self, dico):
+        self.liste_lobby.delete(0, tk.END)
+        for i in dico:
+            self.liste_lobby.insert(tk.END, i[0])
+        
+
 
     def afficher_joueurs(self, joueurs : list[str]):
            for joueur in joueurs:

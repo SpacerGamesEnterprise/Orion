@@ -98,10 +98,11 @@ class GestionnaireSplash(GestionnaireVue):
     def quitter(self):
         self.root.destroy()
 
-    def entrer(self, cls_gestionaire: type[GestionnaireVue]):
+    def entrer(self, cls_gestionaire: type[GestionnaireVue])->GestionnaireVue:
         self.vue.destroy()
         gestionnaire = cls_gestionaire(self, self.controleur)
         gestionnaire.debuter()
+        return gestionnaire
         
     def update_splash(self, etat):
         canvas: Canvas = self.vue.main_canvas
@@ -123,19 +124,18 @@ class GestionnaireSplash(GestionnaireVue):
             canvas.itemconfigure(msg, text="ERREUR - un probleme est survenu")
 
 
+
 class GestionnaireLobby(GestionnaireVue):
     """Gestionnaire du lobby de l'application."""
 
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
         super().__init__(parent, controleur)
         self.vue = VueLobby(parent.vue.main_frame)
-
-
+        
         self.vue.main_canvas.tag_bind(
-            self.vue.bouton_reinitialiser_partie, "<Button-1>",
-            self.ignore_event(self.controleur.reset_partie)
-        )
-
+                self.vue.bouton_commencer, "<Button-1>",
+                self.ignore_event(self.controleur.lancer_partie)
+            )
 
     def ignore_event(self, func: Callable) -> Callable:
         def inner(self, *_):
@@ -144,10 +144,18 @@ class GestionnaireLobby(GestionnaireVue):
 
     def debuter(self):
         self.vue.afficher()
-        self.vue.master.mainloop()
 
     def quitter(self):
         raise NotImplementedError
+    
+    def update_lobby(self,dico):
+        
+        self.vue.update_lobby(dico)
+
+
+        if self.controleur.joueur_createur:
+            #self.btnlancerpartie.config(state=NORMAL) #TODO Faire que le joueur créateur est le seul a commencer une partie
+            pass
     
 class GestionnairePartie(GestionnaireVue):
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
@@ -214,34 +222,3 @@ class GestionnairePartie(GestionnaireVue):
         else:
             canvas.itemconfigure(msg, text="ERREUR - un probleme est survenu")
 
-
-class GestionnaireLobby(GestionnaireVue):
-    """Gestionnaire du lobby de l'application."""
-
-    def __init__(self, parent: GestionnaireVue, controleur: Controleur):
-        super().__init__(parent, controleur)
-        self.vue = VueLobby(parent.vue.main_frame)
-        
-        self.vue.main_canvas.tag_bind(
-                self.vue.bouton_commencer, "<Button-1>",
-                self.ignore_event(self.controleur.lancer_partie)
-            )
-
-    def ignore_event(self, func: Callable) -> Callable:
-        def inner(self, *_):
-            func()
-        return inner
-
-    def debuter(self):
-        self.vue.afficher()
-
-    def quitter(self):
-        raise NotImplementedError
-    
-    def update_lobby(self, dico):
-        self.vue.liste_lobby.delete(0, tk.END)
-        for i in dico:
-            self.vue.liste_lobby.insert(tk.END, i[0])
-        if self.controleur.joueur_createur:
-            #self.btnlancerpartie.config(state=NORMAL) #TODO Faire que le joueur créateur est le seul a commencer une partie
-            pass
