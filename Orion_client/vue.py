@@ -267,13 +267,12 @@ class VueHUD(Vue):
             highlightthickness="3",
             highlightbackground="#525252"
         )
-        self.cadre_info = tk.Frame(
+        self.cadre_info = tk.Canvas(
             self.cadre_outils_v,
             width=200, height=200,
             bg="#525252", highlightthickness="3",
             highlightbackground="darkgrey"
         )
-
         self.minimap.place(
             x=(self.background_width-self.minimap_size-self.ecart_minimap),
             y=self.ecart_minimap
@@ -281,6 +280,12 @@ class VueHUD(Vue):
         self.cadre_outils_h.place(x=0,rely=0.9,relheight=0.1,relwidth=1)
         self.cadre_outils_v.place(x=0,y=0,relheight=0.9,relwidth=0.2)
         self.cadre_info.pack(fill=tk.BOTH)
+    
+    def afficher_info_joueur(self, nom: str):
+        self.nom = self.cadre_info.create_text(
+            50, 20,
+            text=nom, font=('Helvetica 10 bold'),fill="white"
+        )
 
     def afficher_mini_cosmos(self):  # univers(self, mod):
         for j in self.modele.etoiles:
@@ -362,6 +367,10 @@ class VueCosmos(Vue):
             "Orion_client/graphics/planetOrange.png",
             (self.planet_diameter,self.planet_diameter)
         )
+        self.planete_rouge_image = img_resize(
+            "Orion_client/graphics/planetRed.png",
+            (self.planet_diameter,self.planet_diameter)
+        )
         self.background_image = img_resize(
             "Orion_client/graphics/gameBackground.png",
             (self.max_map_size,self.max_map_size)
@@ -419,7 +428,6 @@ class VueCosmos(Vue):
             self.canvas_cosmos.scale(tk.ALL, x, y, factor, factor)
         else: self.map_size = initial_map_size
         self.canvas_cosmos.config(scrollregion=(0,0,self.map_size,self.map_size))
-        print(self.map_size)
         
     def centrer_clic(self, e):
         self.centrer_canvas(self.canvas_cosmos.canvasx(e.x),self.canvas_cosmos.canvasy(e.y))
@@ -427,7 +435,6 @@ class VueCosmos(Vue):
     def mini_clic(self,e):
         x= e.x/self.minimap_size * self.map_size
         y= e.y/self.minimap_size * self.map_size
-        print(x,y)
         self.centrer_canvas(x,y)
 
     def centrer_sur_objet(self,objet)->None:
@@ -456,14 +463,30 @@ class VueCosmos(Vue):
         # affichage des etoiles possedees par les joueurs
         for i in self.modele.joueurs.keys():
             for j in self.modele.joueurs[i].etoilescontrolees:
-                self.canvas_cosmos.create_image(j.x,j.y,
-                  image= self.planete_ai_image,
-                  tags=(j.proprietaire, str(j.id), "Etoile")
-                )
-                self.canvas_cosmos.create_image(j.x,j.y,
-                  image= self.planete_orange_image,
-                  tags=(j.proprietaire, str(j.id), "Etoile")
-                )
+                #si la planète/étoile affiché appartient à un AI
+                if(str(i)[0:2] == "IA"):
+                    self.canvas_cosmos.create_image(j.x,j.y,
+                        image= self.planete_ai_image,
+                        tags=(j.proprietaire, str(j.id), "Etoile")
+                    )
+                    self.canvas_cosmos.create_image(j.x,j.y,
+                        image= self.planete_orange_image,
+                        tags=(j.proprietaire, str(j.id), "Etoile")
+                    ) 
+                #si la planète/étoile affiché appartient à un Joueur
+                else:
+                    self.canvas_cosmos.create_image(j.x,j.y,
+                        image= self.planete_image,
+                        tags=(j.proprietaire, str(j.id), "Etoile")
+                    )
+                    self.canvas_cosmos.create_image(j.x,j.y,
+                        image= self.planete_rouge_image,
+                        tags=(j.proprietaire, str(j.id), "Etoile")
+                    )
+
+                
+                
+                
                 
                 # on affiche dans minimap
                 #minix = j.x / self.modele.largeur * self.taille_minimap
@@ -471,33 +494,3 @@ class VueCosmos(Vue):
                 #self.canevas_minimap.create_rectangle(minix, miniy, minix + 3, miniy + 3,
                 #                                      fill=mod.joueurs[i].couleur,
                 #                                      tags=(j.proprietaire, str(j.id), "Etoile"))
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.geometry("1200x800")
-    root.resizable(False,False)
-    game_frame = tk.Frame(root)
-    
-    # modele temporaire pour gameView
-    
-    modele = Modele(None,[])
-
-    # vue = VueLobby(main_frame,"http://127.0.0.1:8000")
-    joueurs = ["joeyy","Pierrot601","xX_454DPuG_Xx"]
-    # vue.afficher_joueurs(joueurs)
-    vueCosmos = VueCosmos(root,game_frame,modele)
-    vueHUD = VueHUD(root,game_frame,modele)
-    
-    
-    vueCosmos.afficher()
-    vueHUD.afficher()
-    vueHUD.afficher_mini_cosmos()
-    vueCosmos.afficher_decor()
-      
-   
-
-    # vueCosmos.initialiser_avec_modele(modele)
-    # vueCosmos.afficher_decor(modele)
-
-    # game_frame.place(relx=0, rely=0,relheight=1,relwidth=1)
-    root.mainloop()

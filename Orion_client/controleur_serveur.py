@@ -84,10 +84,10 @@ class Controleur():
         # self.urlserveur= "http://jmdeschamps.pythonanywhere.com"
         self.modele: Modele | None = None
         """La variable contenant la partie, après initialiserpartie()"""
-        self.gestionnaire: GestionnaireVue = GestionnaireSplash(None,self)
+        self.gestionnaire_splash: GestionnaireVue = GestionnaireSplash(None,self)
         #self.gestionnaire: GestionnaireVue = GestionnairePartie(None, self)
         """La vue pour l'affichage et les controles du jeu"""
-        self.gestionnaire.debuter()
+        self.gestionnaire_splash.debuter()
         #self.gestionnaire.root.mainloop()
 
         """La boucle des événements (souris, clavier, etc.)"""
@@ -105,7 +105,7 @@ class Controleur():
         if self.prochainsplash:
             # Si on est dans boucler_sur_splash, on doit supprimer
             # le prochain appel
-            self.gestionnaire.root.after_cancel(self.prochainsplash)
+            self.gestionnaire_splash.root.after_cancel(self.prochainsplash)
             self.prochainsplash = None
         if nom:  # Si c'est pas None, c'est un nouveau nom
             self.mon_nom = nom
@@ -117,9 +117,9 @@ class Controleur():
 
         self.joueur_createur = 1
         """on est le createur"""
-        self.gestionnaire.root.title("je suis " + self.mon_nom)
+        self.gestionnaire_splash.root.title("je suis " + self.mon_nom)
         # On passe au lobby pour attendre les autres joueurs
-        self.gestionnaire_lobby = self.gestionnaire.entrer(GestionnaireLobby)
+        self.gestionnaire_lobby = self.gestionnaire_splash.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     def inscrire_joueur(self, nom: str = None) -> None:
@@ -128,7 +128,7 @@ class Controleur():
         """
         # on quitte le splash et sa boucle
         if self.prochainsplash:
-            self.gestionnaire.root.after_cancel(self.prochainsplash)
+            self.gestionnaire_splash.root.after_cancel(self.prochainsplash)
             self.prochainsplash = None
         if nom:
             self.mon_nom = nom
@@ -137,8 +137,8 @@ class Controleur():
         params = {"nom": self.mon_nom}
         reptext = self.appeler_serveur(url, params)
 
-        self.gestionnaire.root.title("je suis " + self.mon_nom)
-        self.gestionnaire_lobby = self.gestionnaire.entrer(GestionnaireLobby)
+        self.gestionnaire_splash.root.title("je suis " + self.mon_nom)
+        self.gestionnaire_lobby = self.gestionnaire_splash.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     # a partir du lobby, le createur avertit le serveur de changer l'etat pour courant
@@ -182,8 +182,8 @@ class Controleur():
         mondict = self.appeler_serveur(url, params)  # TODO: Decode return type
         
         if mondict:
-            self.gestionnaire.update_splash(mondict[0])
-        self.prochainsplash = self.gestionnaire.root.after(
+            self.gestionnaire_splash.update_splash(mondict[0])
+        self.prochainsplash = self.gestionnaire_splash.root.after(
             self.maindelai, self.boucler_sur_splash
         )
 
@@ -195,12 +195,14 @@ class Controleur():
 
         if "courante" in mondict[0]:  # courante, la partie doit etre initialiser
             self.initialiser_partie(mondict)
+            
         else:
             self.joueurs = mondict
             self.gestionnaire_lobby.update_lobby(mondict)
-            self.gestionnaire.root.after(
+            self.gestionnaire_splash.root.after(
                 self.maindelai, self.boucler_sur_lobby
             )
+            
             
     # BOUCLE PRINCIPALE
     def boucler_sur_jeu(self) -> None:
@@ -239,7 +241,7 @@ class Controleur():
             self.onjoue = 1
 
         # Appel ultérieur de la même fonction jusqu'à l'arrêt de la partie
-        self.gestionnaire.root.after(
+        self.gestionnaire_splash.root.after(
             self.maindelai, self.boucler_sur_jeu
         )
 
@@ -250,7 +252,7 @@ class Controleur():
         """
         leurl = self.urlserveur + "/reset_jeu"
         reptext = self.appeler_serveur(leurl, 0)
-        self.gestionnaire.update_splash(reptext[0][0])
+        self.gestionnaire_splash.update_splash(reptext[0][0])
         return reptext
 
     def tester_etat_serveur(self) -> str | tuple[str, tuple[str]]:
@@ -298,7 +300,7 @@ class Controleur():
     def abandonner(self) -> None:
         action = [(self.mon_nom, "abandonner", [self.mon_nom + ": J'ABANDONNE !"])]
         self.actionsrequises = action
-        self.gestionnaire.root.after(500, self.gestionnaire.root.destroy)
+        self.gestionnaire_splash.root.after(500, self.gestionnaire_splash.root.destroy)
 
     ############        VOTRE CODE      ######################
     # TODO: Verify signatures
@@ -319,10 +321,10 @@ class Controleur():
         )
 
     def afficher_etoile(self, joueur: str, cible: str) -> None:
-        self.gestionnaire.afficher_etoile(joueur, cible)
+        self.gestionnaire_splash.afficher_etoile(joueur, cible)
 
     def lister_objet(self, objet: str, id: str) -> None:
-        self.gestionnaire.lister_objet(objet, id)
+        self.gestionnaire_splash.lister_objet(objet, id)
 
 
 if __name__ == "__main__":

@@ -171,22 +171,46 @@ class GestionnairePartie(GestionnaireVue):
 
         self.controleur = controleur
         self.game_frame = tk.Frame(self.root)
-        self.modele = Modele(None, [])
 
+        self.ma_selection = None
 
-        self.vueCosmos = VueCosmos(self.root, self.game_frame,self.modele)
-        self.vueHUD = VueHUD(self.root, self.game_frame,self.modele)
+        self.vueCosmos = VueCosmos(self.root, self.game_frame,self.controleur.modele)
+        self.vueHUD = VueHUD(self.root, self.game_frame,self.controleur.modele)
         
         self.root.geometry(f"{self.vueHUD.background_width}x{self.vueHUD.background_height}")
 
     def bind_controls(self):
         #self.vueCosmos.canvas_cosmos.bind("<MouseWheel>", self.vueCosmos.do_zoom)
-        self.vueCosmos.canvas_cosmos.bind("<Button-1>", self.vueCosmos.centrer_clic)
+        self.vueCosmos.canvas_cosmos.bind("<Button-1>", self.cosmos_clic)
         self.vueHUD.minimap.bind("<Button-3>", self.vueHUD.cacher_mini)
         self.vueHUD.minimap_button.bind("<Button-1>",self.vueHUD.montrer_mini)
         self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
         self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
         
+    def cosmos_clic(self,e):
+
+        self.vueCosmos.centrer_clic(e)
+
+        t = self.vueCosmos.canvas_cosmos.gettags(tk.CURRENT)
+        if t:  # il y a des tags
+            if t[0] == self.controleur.mon_nom:  # et
+                self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
+                print(self.ma_selection)
+                #if t[2] == "Etoile":
+                    #self.montrer_etoile_selection()
+                #elif t[2] == "Flotte":
+                    #self.montrer_flotte_selection()
+            elif ("Etoile" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
+                if self.ma_selection:
+                    #self.parent.cibler_flotte(self.ma_selection[1], t[1], t[2])
+                    pass
+                self.ma_selection = None
+                self.vueCosmos.canvas_cosmos.delete("marqueur")
+        else:  # aucun tag => rien sous la souris - sinon au minimum il y aurait CURRENT
+            print("Region inconnue")
+            self.ma_selection = None
+            self.vueCosmos.canvas_cosmos.delete("marqueur")
+
     def mini_clic(self,e):
         self.vueCosmos.mini_clic(e)
         self.vueHUD.mini_clic(e)
@@ -194,7 +218,9 @@ class GestionnairePartie(GestionnaireVue):
     def debuter(self):
         self.vueCosmos.afficher_decor()
         self.vueCosmos.afficher()
+
         self.vueHUD.afficher()
+        self.vueHUD.afficher_info_joueur(self.controleur.mon_nom)
         self.vueHUD.afficher_mini_cosmos()
         self.bind_controls()
         self.game_frame.mainloop()

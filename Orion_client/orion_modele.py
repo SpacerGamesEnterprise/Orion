@@ -258,6 +258,7 @@ class Modele():
                       "SeaGreen1", "turquoise1", "firebrick1"]
         for i in range(ias):
             self.joueurs["IA_" + str(i)] = IA(self, "IA_" + str(i), etoile_occupee.pop(0), couleursia.pop(0))
+        print(self.joueurs)
 
     ##############################################################################
     def jouer_prochain_coup(self, cadre):
@@ -279,7 +280,7 @@ class Modele():
         for i in self.joueurs:
             self.joueurs[i].jouer_prochain_coup()
 
-        # NOTE si le modele (qui représente l'univers !!! )
+        # NOTE si le modele (qui représent.keyse l'univers !!! )
         #      fait des actions - on les activera ici...
         for i in self.trou_de_vers:
             i.jouer_prochain_coup()
