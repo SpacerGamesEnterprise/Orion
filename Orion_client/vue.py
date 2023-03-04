@@ -3,10 +3,10 @@ from ctypes import WinDLL
 from dis import dis
 from doctest import master
 import tkinter as tk
+
 from tkinter.simpledialog import *
 from tkinter.messagebox import *
 from helper import Helper as hlp
-from PIL import Image, ImageTk
 import math
 
 #import temporaire
@@ -15,11 +15,21 @@ from orion_modele import *
 import random
 
 
+
+# Actual imports from here
+from abc import ABC
+
+import os.path
+
+import tkinter as tk
+from PIL import Image, ImageTk
+
+
 def img_format(file: str) -> tk.PhotoImage:
     img = Image.open(file)
     img = img.convert('RGBA')
     data = img.getdata()
-    
+
     new_data = []
     for item in data:
         if item[0] == 255 and item[1] == 255 and item[2] == 0:  # finding yellow colour
@@ -27,7 +37,7 @@ def img_format(file: str) -> tk.PhotoImage:
             new_data.append((255, 255, 255, 0))
         else:
             new_data.append(item)
-    
+
     img.putdata(new_data)
     return ImageTk.PhotoImage(img)
 
@@ -37,6 +47,9 @@ def img_resize(file:str, dimensions: tuple[int, int]) -> tk.PhotoImage:
     
     return ImageTk.PhotoImage(img)
 
+def getimg(name: str) -> str:
+    """Retourne le liens vers l'image demandée"""
+    return os.path.join(os.path.dirname(__file__), "graphics", name)
 
 class Vue(ABC):
     def __init__(self, master: tk.Widget):
@@ -70,6 +83,7 @@ class VueSplash(Vue):
             width=self.background_width,
             height=self.background_height,
             highlightthickness=0)
+            
         self.background_img = img_resize(
             "Orion_client/graphics/menuBackground.png", (self.background_width,
                                         self.background_height)
@@ -117,11 +131,11 @@ class VueSplash(Vue):
         #Essaie pour lier les boutons avec les canvas
         #self.bouton_creer_partie = tk.Button(text=self.bouton_creer_partie_message, width=self.background_width, height=self.background_height,
         #    bg="blue", command=v.creer_partie)
-        
-        
+
+
         self.value_nom = tk.StringVar()
         self.value_url = tk.StringVar()
-        
+
         self.input_nom = tk.Entry(
             self.main_frame,
             textvariable=self.value_nom,
@@ -157,6 +171,7 @@ class VueLobby(Vue):
         self.background_img = self.img_format(
             "Orion_client/graphics/menuBackground.png", 
         )
+        
         self.background_img = img_resize(
             self.background_img,
             (2000,2000)
@@ -165,14 +180,19 @@ class VueLobby(Vue):
         self.background = self.main_canvas.create_image(
             self.background_width/2, self.background_height/2,
             image=self.background_img)
-        self.bouton_connecter = self.main_canvas.create_rectangle(
+        self.bouton_commencer = self.main_canvas.create_rectangle(
             self.background_width/2-100, self.background_height-200,
             self.background_width/2+100, self.background_height-150,
             fill="black")
-
+        
+        self.text_commencer = self.main_canvas.create_text(
+            self.background_width/2-15, self.background_height-175,
+            text="Commencer Partie", font=('Helvetica 10 bold'),fill="white"
+        )
+        
         self.url = self.main_canvas.create_text(
             self.background_width*0.5,self.background_height*0.23,
-            text=self.url_serveur, font=('Helvetica 15 bold'),fill="white"  # TODO: CHANGE URL
+            text="Joueurs", font=('Helvetica 15 bold'),fill="white" 
         )
 
         self.liste_lobby = tk.Listbox(self.main_frame,borderwidth=0)
@@ -183,8 +203,8 @@ class VueLobby(Vue):
 
     def afficher_joueurs(self, joueurs : list[str]):
            for joueur in joueurs:
-                self.liste_lobby.insert(tk.END, joueur)
-                
+                self.liste_lobby.insert(tk.END, joueur)               
+
 class VueHUD(Vue):
     def __init__(self, master: tk.Widget,game_frame:tk.Frame,modele:Modele):
         super().__init__(master)
@@ -424,6 +444,7 @@ class VueCosmos(Vue):
 
 
     def afficher_decor(self): # TODO: faire un truc plus propre
+
         # affichage des etoiles
         for i in self.modele.etoiles:
             self.canvas_cosmos.create_image(i.x, i.y,
@@ -470,15 +491,11 @@ if __name__ == "__main__":
     vueHUD.afficher()
     vueHUD.afficher_mini_cosmos()
     vueCosmos.afficher_decor()
-    
-    
-    
-    
-    
+      
+   
 
-    
     # vueCosmos.initialiser_avec_modele(modele)
     # vueCosmos.afficher_decor(modele)
-    
+
     # game_frame.place(relx=0, rely=0,relheight=1,relwidth=1)
     root.mainloop()

@@ -23,6 +23,9 @@ class GestionnaireVue(ABC):
         """Vue de chaque gestionnaire."""
         self.parent = parent
         """Parent du gestionnaire (le gestionnaire qui l'a créé)."""
+        if self.parent:
+            self.root = self.parent.root
+           
         self.controleur = controleur
         """Contrôleur de l'application."""
 
@@ -127,8 +130,21 @@ class GestionnaireLobby(GestionnaireVue):
         super().__init__(parent, controleur)
         self.vue = VueLobby(parent.vue.main_frame)
 
+
+        self.vue.main_canvas.tag_bind(
+            self.vue.bouton_reinitialiser_partie, "<Button-1>",
+            self.ignore_event(self.controleur.reset_partie)
+        )
+
+
+    def ignore_event(self, func: Callable) -> Callable:
+        def inner(self, *_):
+            func()
+        return inner
+
     def debuter(self):
         self.vue.afficher()
+        self.vue.master.mainloop()
 
     def quitter(self):
         raise NotImplementedError
@@ -173,8 +189,59 @@ class GestionnairePartie(GestionnaireVue):
     def quitter(self):
         self.root.destroy()
 
-    def entrer(self, gestionaire: GestionnaireVue):
-        self.vue.cacher()
-        gestionaire.debuter()
+    def entrer(self, cls_gestionaire: type[GestionnaireVue]) -> GestionnaireVue:
+        self.vue.destroy()
+        gestionnaire = cls_gestionaire(self, self.controleur)
+        gestionnaire.debuter()
+        return gestionnaire
+        
+    def update_splash(self, etat):
+        canvas: Canvas = self.vue.main_canvas
+        msg: int = self.vue.message
+        if "attente" in etat or "courante" in etat:
+            pass
+            #self.btncreerpartie.config(state=DISABLED)
+        if "courante" in etat:
+            canvas.itemconfigure(msg, text="Desole - partie encours !")
+            #self.btninscrirejoueur.config(state=DISABLED)
+        elif "attente" in etat:
+            canvas.itemconfigure(msg, text="Partie en attente de joueurs !")
+            #self.btninscrirejoueur.config(state=NORMAL)
+        elif "dispo" in etat:
+            canvas.itemconfigure(msg, text="Bienvenue ! Serveur disponible")
+            #self.btninscrirejoueur.config(state=DISABLED)
+            #self.btncreerpartie.config(state=NORMAL)
+        else:
+            canvas.itemconfigure(msg, text="ERREUR - un probleme est survenu")
 
+
+class GestionnaireLobby(GestionnaireVue):
+    """Gestionnaire du lobby de l'application."""
+
+    def __init__(self, parent: GestionnaireVue, controleur: Controleur):
+        super().__init__(parent, controleur)
+        self.vue = VueLobby(parent.vue.main_frame)
+        
+        self.vue.main_canvas.tag_bind(
+                self.vue.bouton_commencer, "<Button-1>",
+                self.ignore_event(self.controleur.lancer_partie)
+            )
+
+    def ignore_event(self, func: Callable) -> Callable:
+        def inner(self, *_):
+            func()
+        return inner
+
+    def debuter(self):
+        self.vue.afficher()
+
+    def quitter(self):
+        raise NotImplementedError
     
+    def update_lobby(self, dico):
+        self.vue.liste_lobby.delete(0, tk.END)
+        for i in dico:
+            self.vue.liste_lobby.insert(tk.END, i[0])
+        if self.controleur.joueur_createur:
+            #self.btnlancerpartie.config(state=NORMAL) #TODO Faire que le joueur créateur est le seul a commencer une partie
+            pass

@@ -11,7 +11,11 @@ import urllib.request
 
 from orion_modele import *
 from orion_vue import *
-from gestionnaire_vue import GestionnaireVue, GestionnairePartie,GestionnaireSplash
+from gestionnaire_vue import (
+    GestionnaireVue,
+    GestionnaireSplash,
+    GestionnaireLobby,
+)
 
 # TODO: Type alias for server status
 # TODO: Change lists and tuples to sequence
@@ -84,13 +88,14 @@ class Controleur():
         """La vue pour l'affichage et les controles du jeu"""
         self.gestionnaire.debuter()
         #self.gestionnaire.root.mainloop()
+
         """La boucle des événements (souris, clavier, etc.)"""
 
     ##################################################################
     # FONCTIONS RESERVEES - INTERDICTION DE MODIFIER SANS AUTORISATION
     # PREALABLE SAUF CHOIX DE RANDOM SEED LIGNE 94-95
 
-    def connecter_serveur(self, *_) -> None:
+    def connecter_serveur(self) -> None:
         """Le dernier avant le clic"""
         self.boucler_sur_splash()
 
@@ -99,7 +104,7 @@ class Controleur():
         self.connecter_serveur()
 
     # a partir du splash
-    def creer_partie(self, nom: str) -> None:
+    def creer_partie(self, nom: str = None) -> None:
         if self.prochainsplash:
             # Si on est dans boucler_sur_splash, on doit supprimer
             # le prochain appel
@@ -117,10 +122,10 @@ class Controleur():
         """on est le createur"""
         self.gestionnaire.root.title("je suis " + self.mon_nom)
         # On passe au lobby pour attendre les autres joueurs
-        self.gestionnaire.changer_cadre("lobby")
+        self.gestionnaire = self.gestionnaire.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
-    def inscrire_joueur(self, nom: str, urljeu: str) -> None:
+    def inscrire_joueur(self, nom: str = None) -> None:
         """Inscription d'un joueur à la partie, répétition de code avec
         creer_partie
         """
@@ -136,7 +141,7 @@ class Controleur():
         reptext = self.appeler_serveur(url, params)
 
         self.gestionnaire.root.title("je suis " + self.mon_nom)
-        self.gestionnaire.changer_cadre("lobby")
+        self.gestionnaire = self.gestionnaire.entrer(GestionnaireLobby)
         self.boucler_sur_lobby()
 
     # a partir du lobby, le createur avertit le serveur de changer l'etat pour courant
@@ -191,15 +196,16 @@ class Controleur():
         url = self.urlserveur + "/boucler_sur_lobby"
         params = {"nom": self.mon_nom}
         mondict: list[tuple[str, int]] | tuple[Literal["courante"], tuple[int]] = self.appeler_serveur(url, params)
-        print(f"{mondict = }")
 
         if "courante" in mondict[0]:  # courante, la partie doit etre initialiser
             self.initialiser_partie(mondict)
         else:
             self.joueurs = mondict
             self.gestionnaire.update_lobby(mondict)
-            self.gestionnaire.root.after(self.maindelai, self.boucler_sur_lobby)
-
+            self.gestionnaire.root.after(
+                self.maindelai, self.boucler_sur_lobby
+            )
+            
     # BOUCLE PRINCIPALE
     def boucler_sur_jeu(self) -> None:
         """Boucle principale du jeu"""

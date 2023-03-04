@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 ##  version 2022 14 mars - jmd
 
-import random
 import ast
-from id import *
-from helper import Helper as hlp
-
+import random
+from modeles.planete import Planete
+from id import get_prochain_id
 
 class Porte_de_vers():
     def __init__(self, parent, x, y, couleur, taille):
@@ -33,93 +32,79 @@ class Trou_de_vers():
 
     def jouer_prochain_coup(self):
         self.porte_a.jouer_prochain_coup()
-        self.porte_b.jouer_prochain_coup()
+        self.porte_b.jouer_prochain_coup()            
+
+# class Vaisseau():
+#    def __init__(self, parent, nom, x, y):
+#        self.parent = parent
+#        self.id = get_prochain_id()
+#        self.proprietaire = nom
+#        self.x = x
+#        self.y = y
+#        self.espace_cargo = 0
+#        self.energie = 100
+#        self.taille = 5
+#        self.vitesse = 2
+#        self.cible = 0
+#        self.type_cible = None
+#        self.angle_cible = 0
+#        self.arriver = {"Etoile": self.arriver_etoile,
+#                        "Porte_de_vers": self.arriver_porte}
+
+#    def jouer_prochain_coup(self, trouver_nouveau=0):
+#        if self.cible != 0:
+#            return self.avancer()
+#        elif trouver_nouveau:
+#            cible = random.choice(self.parent.parent.etoiles)
+#            self.acquerir_cible(cible, "Etoile")
+
+#    def acquerir_cible(self, cible, type_cible):
+#        self.type_cible = type_cible
+#        self.cible = cible
+#        self.angle_cible = hlp.calcAngle(self.x, self.y, self.cible.x, self.cible.y)
+
+#    def avancer(self):
+#        if self.cible != 0:
+#            x = self.cible.x
+#            y = self.cible.y
+#            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.x, self.y)
+#            if hlp.calcDistance(self.x, self.y, x, y) <= self.vitesse:
+#                type_obj = type(self.cible).__name__
+#                rep = self.arriver[type_obj]()
+#                return rep
+
+#    def arriver_etoile(self):
+#        self.parent.log.append(
+#            ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
+#        if not self.cible.proprietaire:
+#            self.cible.proprietaire = self.proprietaire
+#        cible = self.cible
+#        self.cible = 0
+#        return ["Etoile", cible]
+
+#    def arriver_porte(self):
+#        self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
+#        cible = self.cible
+#        trou = cible.parent
+#        if cible == trou.porte_a:
+#            self.x = trou.porte_b.x + random.randrange(6) + 2
+#            self.y = trou.porte_b.y
+#        elif cible == trou.porte_b:
+#            self.x = trou.porte_a.x - random.randrange(6) + 2
+#            self.y = trou.porte_a.y
+#        self.cible = 0
+#        return ["Porte_de_ver", cible]
 
 
-class Etoile():
-    def __init__(self, parent, x, y):
-        self.id = get_prochain_id()
-        self.parent = parent
-        self.proprietaire = ""
-        self.x = x
-        self.y = y
-        self.taille = random.randrange(4, 8)
-        self.ressources = {"metal": 1000,
-                           "energie": 10000,
-                           "existentielle": 100}
-
-
-class Vaisseau():
-    def __init__(self, parent, nom, x, y):
-        self.parent = parent
-        self.id = get_prochain_id()
-        self.proprietaire = nom
-        self.x = x
-        self.y = y
-        self.espace_cargo = 0
-        self.energie = 100
-        self.taille = 5
-        self.vitesse = 2
-        self.cible = 0
-        self.type_cible = None
-        self.angle_cible = 0
-        self.arriver = {"Etoile": self.arriver_etoile,
-                        "Porte_de_vers": self.arriver_porte}
-
-    def jouer_prochain_coup(self, trouver_nouveau=0):
-        if self.cible != 0:
-            return self.avancer()
-        elif trouver_nouveau:
-            cible = random.choice(self.parent.parent.etoiles)
-            self.acquerir_cible(cible, "Etoile")
-
-    def acquerir_cible(self, cible, type_cible):
-        self.type_cible = type_cible
-        self.cible = cible
-        self.angle_cible = hlp.calcAngle(self.x, self.y, self.cible.x, self.cible.y)
-
-    def avancer(self):
-        if self.cible != 0:
-            x = self.cible.x
-            y = self.cible.y
-            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.x, self.y)
-            if hlp.calcDistance(self.x, self.y, x, y) <= self.vitesse:
-                type_obj = type(self.cible).__name__
-                rep = self.arriver[type_obj]()
-                return rep
-
-    def arriver_etoile(self):
-        self.parent.log.append(
-            ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
-        if not self.cible.proprietaire:
-            self.cible.proprietaire = self.proprietaire
-        cible = self.cible
-        self.cible = 0
-        return ["Etoile", cible]
-
-    def arriver_porte(self):
-        self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
-        cible = self.cible
-        trou = cible.parent
-        if cible == trou.porte_a:
-            self.x = trou.porte_b.x + random.randrange(6) + 2
-            self.y = trou.porte_b.y
-        elif cible == trou.porte_b:
-            self.x = trou.porte_a.x - random.randrange(6) + 2
-            self.y = trou.porte_a.y
-        self.cible = 0
-        return ["Porte_de_ver", cible]
-
-
-class Cargo(Vaisseau):
-    def __init__(self, parent, nom, x, y):
-        Vaisseau.__init__(self, parent, nom, x, y)
-        self.cargo = 1000
-        self.energie = 500
-        self.taille = 6
-        self.vitesse = 1
-        self.cible = 0
-        self.ang = 0
+# class Cargo(Vaisseau):
+#    def __init__(self, parent, nom, x, y):
+#        Vaisseau.__init__(self, parent, nom, x, y)
+#        self.cargo = 1000
+#        self.energie = 500
+#        self.taille = 6
+#        self.vitesse = 1
+#        self.cible = 0
+#        self.ang = 0
 
 
 class Joueur():
@@ -137,17 +122,17 @@ class Joueur():
         self.actions = {"creervaisseau": self.creervaisseau,
                         "ciblerflotte": self.ciblerflotte}
 
-    def creervaisseau(self, params):
-        type_vaisseau = params[0]
-        if type_vaisseau == "Cargo":
-            v = Cargo(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
-        else:
-            v = Vaisseau(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
-        self.flotte[type_vaisseau][v.id] = v
+    # def creervaisseau(self, params):  //A voir pour création vaisseau
+    #     type_vaisseau = params[0]
+    #     if type_vaisseau == "Cargo":
+    #         v = Cargo(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
+    #     else:
+    #         v = Vaisseau(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
+    #     self.flotte[type_vaisseau][v.id] = v
 
-        if self.nom == self.parent.parent.mon_nom:
-            self.parent.parent.lister_objet(type_vaisseau, v.id)
-        return v
+    #     if self.nom == self.parent.parent.mon_nom:
+    #         self.parent.parent.lister_objet(type_vaisseau, v.id)
+    #     return v
 
     def ciblerflotte(self, ids):
         idori, iddesti, type_cible = ids
@@ -246,7 +231,7 @@ class Modele():
         for i in range(self.nb_etoiles):
             x = random.randrange(self.largeur - (2 * bordure)) + bordure
             y = random.randrange(self.hauteur - (2 * bordure)) + bordure
-            self.etoiles.append(Etoile(self, x, y))
+            self.etoiles.append(Planete(self, x, y))
         np = len(joueurs) + ias
         etoile_occupee = []
         while np:
@@ -267,7 +252,7 @@ class Modele():
             for e in range(5):
                 x1 = random.randrange(x - dist, x + dist)
                 y1 = random.randrange(y - dist, y + dist)
-                self.etoiles.append(Etoile(self, x1, y1))
+                self.etoiles.append(Planete(self, x1, y1))
 
         # IA- creation des ias
         couleursia = ["orange", "green", "cyan",
