@@ -221,6 +221,10 @@ class VueHUD(Vue):
         self.cursor_height = 20
         self.cursor_width = 28
 
+        self.cadre_h_width = self.background_width
+        self.cadre_h_height = self.background_height * 0.1
+        self.cadre_v_width = self.background_width * 0.2
+        self.cadre_v_height = self.background_height * 0.9
         
         if(master!=None):
             master.geometry(f"{self.background_width}x{self.background_height}")
@@ -255,15 +259,13 @@ class VueHUD(Vue):
             self.cursor_width,self.cursor_height,
             width=2,outline="#525252"
         )
-        self.cadre_outils_h = tk.Frame(
-            self.main_frame,
-            width=75, height=75, bg="darkgrey",
+        self.cadre_outils_h = tk.Canvas(
+            self.main_frame, bg="darkgrey",
             highlightthickness="3",
             highlightbackground="#525252"
         )
-        self.cadre_outils_v = tk.Frame(
-            self.main_frame,
-            width=200, height=200, bg="darkgrey",
+        self.cadre_outils_v = tk.Canvas(
+            self.main_frame, bg="darkgrey",
             highlightthickness="3",
             highlightbackground="#525252"
         )
@@ -280,11 +282,24 @@ class VueHUD(Vue):
         self.cadre_outils_h.place(x=0,rely=0.9,relheight=0.1,relwidth=1)
         self.cadre_outils_v.place(x=0,y=0,relheight=0.9,relwidth=0.2)
         self.cadre_info.pack(fill=tk.BOTH)
+
+        self.load_menu_planete()
+        self.load_menu_vaisseau()
+        
+    def load_menu_planete(self):
+        self.bouton_batiment = tk.Button(self.cadre_outils_h,
+            width= int(self.cadre_h_width/5),height = int(self.cadre_h_height),
+            text="Construire Batiment",
+            font=('Helvetica 10 bold')
+        )
+
+    def load_menu_vaisseau(self):
+        pass
     
     def afficher_info_joueur(self, nom: str):
         self.nom = self.cadre_info.create_text(
             50, 20,
-            text=nom, font=('Helvetica 10 bold'),fill="white"
+            text=nom, font=('Helvetica 10'),fill="white"
         )
 
     def afficher_mini_cosmos(self):  # univers(self, mod):
@@ -327,6 +342,13 @@ class VueHUD(Vue):
         )
         self.minimap_button.place_forget()
         
+    
+    def afficher_menu_planete(self):
+        self.bouton_batiment.pack(expand=False)
+    
+    def afficher_menu_vaisseau(self):
+        pass
+
 class VueCosmos(Vue):
     def __init__(self, master: tk.Widget,game_frame:tk.Frame,modele:Modele):
         super().__init__(master)
@@ -349,12 +371,42 @@ class VueCosmos(Vue):
 
         self.zoom = 3
 
+        self.load_images()
+        
         self.canvas_cosmos = tk.Canvas(self.main_frame,
             height=self.map_size,width=self.map_size,
             bg = "black", borderwidth=0,highlightthickness=0,
             scrollregion=(0,0,self.map_size,self.map_size)
         )
         
+        self.background = self.canvas_cosmos.create_image(
+            self.max_map_size/2,self.max_map_size/2,
+            image = self.background_image
+        )
+        
+        self.scrollX = tk.Scrollbar(self.main_frame, orient=tk.HORIZONTAL)
+        self.scrollY = tk.Scrollbar(self.main_frame, orient=tk.VERTICAL)
+
+        
+        self.scrollX.pack(side=tk.BOTTOM,fill=tk.X)
+        self.scrollY.pack(side=tk.LEFT,fill=tk.Y)
+        self.canvas_cosmos.place(
+            relx=0.18,rely=0,
+            relheight=0.91,relwidth=0.82
+        )
+        
+        
+        self.scrollX.config(command=self.canvas_cosmos.xview)
+        self.scrollY.config(command=self.canvas_cosmos.yview)
+        
+        self.canvas_cosmos.config(
+            yscrollcommand=self.scrollX.set,
+            xscrollcommand=self.scrollY.set
+        )
+
+        
+
+    def load_images(self):
         self.planete_image = img_resize(
             "Orion_client/graphics/planet.png",
             (self.planet_diameter,self.planet_diameter)
@@ -375,40 +427,6 @@ class VueCosmos(Vue):
             "Orion_client/graphics/gameBackground.png",
             (self.max_map_size,self.max_map_size)
         )
-
-        self.background = self.canvas_cosmos.create_image(
-            self.max_map_size/2,self.max_map_size/2,
-            image = self.background_image
-        )
-        
-        self.scrollX = tk.Scrollbar(self.main_frame, orient=tk.HORIZONTAL)
-        self.scrollY = tk.Scrollbar(self.main_frame, orient=tk.VERTICAL)
-        
-        self.scrollX.config(command=self.canvas_cosmos.xview)
-        self.scrollY.config(command=self.canvas_cosmos.yview)
-        
-        self.canvas_cosmos.config(
-            yscrollcommand=self.scrollX.set,
-            xscrollcommand=self.scrollY.set
-        )
-        
-        self.scrollX.pack(side=tk.BOTTOM,fill=tk.X)
-        self.scrollY.pack(side=tk.LEFT,fill=tk.Y)
-        self.canvas_cosmos.place(
-            relx=0.18,rely=0,
-            relheight=0.91,relwidth=0.82
-        )
-        
-        
-        #TEMP FOR DEBUG
-        ##########################################################
-        #
-        #ZOOM FONCTIONNE A MOITIÉ,BUG A FIX PLUS TARD
-        #
-        #self.main_canvas.bind("<MouseWheel>", self.do_zoom)
-        #
-        #self.canvas_cosmos.bind("<Button-1>", self.centrer_clic )
-        ##########################################################
         
     
     def do_zoom(self,e):

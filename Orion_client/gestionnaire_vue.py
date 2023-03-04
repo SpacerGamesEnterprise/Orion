@@ -195,10 +195,11 @@ class GestionnairePartie(GestionnaireVue):
         if t:  # il y a des tags
             if t[0] == self.controleur.mon_nom:  # et
                 self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
-                print(self.ma_selection)
-                #if t[2] == "Etoile":
+                if t[2] == "Etoile":
+                    self.afficher_menu_planete()
                     #self.montrer_etoile_selection()
-                #elif t[2] == "Flotte":
+                elif t[2] == "Flotte":
+                    self.afficher_menu_vaisseau()
                     #self.montrer_flotte_selection()
             elif ("Etoile" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
                 if self.ma_selection:
@@ -210,6 +211,13 @@ class GestionnairePartie(GestionnaireVue):
             print("Region inconnue")
             self.ma_selection = None
             self.vueCosmos.canvas_cosmos.delete("marqueur")
+
+    def afficher_menu_planete(self):
+        self.vueHUD.afficher_menu_planete()
+    
+    def afficher_menu_vaisseau(self):
+        pass
+
 
     def mini_clic(self,e):
         self.vueCosmos.mini_clic(e)
@@ -234,23 +242,4 @@ class GestionnairePartie(GestionnaireVue):
         gestionnaire = cls_gestionaire(self, self.controleur)
         gestionnaire.debuter()
         return gestionnaire
-        
-    def update_splash(self, etat):
-        canvas: Canvas = self.vue.main_canvas
-        msg: int = self.vue.message
-        if "attente" in etat or "courante" in etat:
-            pass
-            #self.btncreerpartie.config(state=DISABLED)
-        if "courante" in etat:
-            canvas.itemconfigure(msg, text="Desole - partie encours !")
-            #self.btninscrirejoueur.config(state=DISABLED)
-        elif "attente" in etat:
-            canvas.itemconfigure(msg, text="Partie en attente de joueurs !")
-            #self.btninscrirejoueur.config(state=NORMAL)
-        elif "dispo" in etat:
-            canvas.itemconfigure(msg, text="Bienvenue ! Serveur disponible")
-            #self.btninscrirejoueur.config(state=DISABLED)
-            #self.btncreerpartie.config(state=NORMAL)
-        else:
-            canvas.itemconfigure(msg, text="ERREUR - un probleme est survenu")
-
+    
