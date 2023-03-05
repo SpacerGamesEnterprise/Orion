@@ -216,6 +216,7 @@ class VueHUD(Vue):
         self.background_width = 1200
         self.background_height = 800
         self.button_size = 50
+        self.map_size = 9000
         self.minimap_size = 240
         self.ecart_minimap = 25
         self.cursor_height = 20
@@ -247,17 +248,16 @@ class VueHUD(Vue):
         self.minimap = tk.Canvas(
             self.main_frame,
             width=self.minimap_size, height=self.minimap_size,                      
-            bg="#525252"
+            bg="#000000",highlightbackground ="#a48dc2"
         )
         self.minimap_background = self.minimap.create_image(
             self.minimap_size/2,self.minimap_size/2,
             image = self.minimap_background_img,
         )
-
         self.minimap_cursor = self.minimap.create_rectangle(
             0,0,
             self.cursor_width,self.cursor_height,
-            width=2,outline="#525252"
+            width=2,outline="#a48dc2",dash=(5, 1, 2, 1)
         )
         self.cadre_outils_h = tk.Canvas(
             self.main_frame, bg="darkgrey",
@@ -405,7 +405,7 @@ class VueHUD(Vue):
             miniy = j.y / self.modele.hauteur * self.minimap_size
             self.minimap.create_rectangle(
                 minix, miniy, minix + 3, miniy + 3,
-                fill="#525252",
+                fill="#FFFFFF",
                 tags=("mini", "Etoile")
             )
         for i in self.modele.joueurs.keys():
@@ -423,9 +423,15 @@ class VueHUD(Vue):
         self.minimap_cursor = self.minimap.create_rectangle(
             e.x-self.cursor_width/2,e.y - self.cursor_height/2,
             e.x+self.cursor_width/2,e.y + self.cursor_height/2,
-            width=2,outline="#525252"
+            width=2,outline="#a48dc2",dash=(5, 1, 2, 1)
         )
     
+    def reposition_cursor(self,move_x,move_y):
+        cursor_move_x = (move_x / self.map_size)*self.minimap_size
+        cursor_move_y = (move_y / self.map_size)*self.minimap_size
+        self.minimap.move(self.minimap_cursor,cursor_move_x,cursor_move_y)
+
+
     def cacher_mini(self,e):
         self.minimap.place_forget()
         self.minimap_button.place(
@@ -564,11 +570,10 @@ class VueCosmos(Vue):
         self.background_y = y
     
     def centrer_canvas(self,x,y):
-
         self.centrer_background(x,y)
 
-        x1 = (self.canvas_cosmos.winfo_width() / 2) + (self.canvas_cosmos.winfo_width() / 9)#pas au centre de l'écran car il y a le HUD
-        y1 = (self.canvas_cosmos.winfo_height() / 2) - (self.canvas_cosmos.winfo_height() / 20)
+        x1 = (self.canvas_cosmos.winfo_width() / 2)#pas au centre de l'écran car il y a le HUD
+        y1 = (self.canvas_cosmos.winfo_height() / 2)
 
         pctx = (x - x1) / self.map_size
         pcty = (y - y1) / self.map_size

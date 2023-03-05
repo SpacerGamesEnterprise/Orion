@@ -198,9 +198,18 @@ class GestionnairePartie(GestionnaireVue):
         self.controleur.creer_vaisseau(type_vaisseau)
 
     def cosmos_clic(self,e):
-
+        before_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
+        before_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
         self.vueCosmos.centrer_clic(e)
+        after_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
+        after_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
 
+        move_x = after_x - before_x
+        move_y = after_y - before_y
+
+        self.vueHUD.reposition_cursor(move_x,move_y)
+        
+        #self.vueHUD.reposition_cursor()
         t = self.vueCosmos.canvas_cosmos.gettags(tk.CURRENT)
         if t:  # il y a des tags
             if t[0] == self.controleur.mon_nom:  # et
