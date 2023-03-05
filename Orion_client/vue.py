@@ -296,6 +296,12 @@ class VueHUD(Vue):
     def load_menu_vaisseau(self):
         pass
     
+    def afficher_menu_planete(self):
+        self.bouton_batiment.pack(expand=False)
+    
+    def afficher_menu_vaisseau(self):
+        pass
+
     def afficher_info_joueur(self, nom: str):
         self.nom = self.cadre_info.create_text(
             50, 20,
@@ -343,11 +349,7 @@ class VueHUD(Vue):
         self.minimap_button.place_forget()
         
     
-    def afficher_menu_planete(self):
-        self.bouton_batiment.pack(expand=False)
     
-    def afficher_menu_vaisseau(self):
-        pass
 
 class VueCosmos(Vue):
     def __init__(self, master: tk.Widget,game_frame:tk.Frame,modele:Modele):
@@ -357,18 +359,19 @@ class VueCosmos(Vue):
         
         self.modele = modele
         self.background_width = 1200
-        self.background_height = 80
+        self.background_height = 800
         self.minimap_size = 240
 
         self.planet_diameter = 75
         self.color_planet_diameter = 75
 
         self.map_size = 9000#taille du canvas du cosmos
-        self.max_map_size = 9000
-        self.min_map_size = 2000
-
-
-
+        self.max_map_size = 1500
+        self.min_map_size = 1500
+        
+        #variables pour effet de profondeur
+        self.background_x = self.background_width/2
+        self.background_y = self.background_height/2
         self.zoom = 3
 
         self.load_images()
@@ -458,8 +461,21 @@ class VueCosmos(Vue):
     def centrer_sur_objet(self,objet)->None:
         self.centrer_canvas(objet.x,objet.y)
 
-    def centrer_canvas(self,x,y):
+    def centrer_background(self,x,y):
+        move_x = x - self.background_x
+        move_y = y - self.background_y
+          
+        move_background_x = (move_x /(self.map_size-self.background_width))*(self.map_size - self.max_map_size)
+        move_background_y = (move_y /(self.map_size-self.background_height))*(self.map_size - self.max_map_size)
+        
+        self.canvas_cosmos.move(self.background, move_background_x , move_background_y)
+        self.background_x = x
+        self.background_y = y
     
+    def centrer_canvas(self,x,y):
+
+        self.centrer_background(x,y)
+
         x1 = (self.canvas_cosmos.winfo_width() / 2) + (self.canvas_cosmos.winfo_width() / 9)#pas au centre de l'écran car il y a le HUD
         y1 = (self.canvas_cosmos.winfo_height() / 2) - (self.canvas_cosmos.winfo_height() / 20)
 
@@ -469,6 +485,7 @@ class VueCosmos(Vue):
         self.canvas_cosmos.xview_moveto(pctx)
         self.canvas_cosmos.yview_moveto(pcty)
 
+        print("x:",x,",y:",y,"\nbx:",self.background_x,",by:",self.background_y)
 
     def afficher_decor(self): # TODO: faire un truc plus propre
 
