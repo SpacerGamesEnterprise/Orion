@@ -3,6 +3,7 @@
 
 import ast
 import random
+from modeles.vaisseau import Cargo, Eclaireur, Combat
 from modeles.batiment import Usine
 from id import get_prochain_id
 from modeles.planete import Planete
@@ -118,21 +119,24 @@ class Joueur():
         self.couleur = couleur
         self.log = []
         self.etoilescontrolees = [etoilemere]
-        self.flotte = {"Vaisseau": {},
-                       "Cargo": {}}
+        self.flotte = {"Eclaireur": {},
+                       "Cargo": {},
+                       "Combat": {}}
         self.actions = {"ciblerflotte": self.ciblerflotte}
 
-    # def creervaisseau(self, params):  //A voir pour création vaisseau
-    #     type_vaisseau = params[0]
-    #     if type_vaisseau == "Cargo":
-    #         v = Cargo(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
-    #     else:
-    #         v = Vaisseau(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
-    #     self.flotte[type_vaisseau][v.id] = v
+    def creervaisseau(self, params): #TODO update hangar
+        type_vaisseau = params[0]
+        if type_vaisseau == "Cargo":
+            v = Cargo(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
+        elif type_vaisseau == "Eclaireur":
+            v = Eclaireur(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
+        else:
+            v = Combat(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
+        self.flotte[type_vaisseau][v.id] = v
+        if self.nom == self.parent.parent.mon_nom:
+            self.parent.parent.lister_objet(type_vaisseau, v.id)
+        return v
 
-    #     if self.nom == self.parent.parent.mon_nom:
-    #         self.parent.parent.lister_objet(type_vaisseau, v.id)
-    #     return v
 
     def ciblerflotte(self, ids):
         idori, iddesti, type_cible = ids

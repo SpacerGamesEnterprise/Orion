@@ -288,9 +288,22 @@ class VueHUD(Vue):
         
     def load_menu_planete(self):
         self.bouton_batiment = tk.Button(self.cadre_outils_h,
-            width= int(self.cadre_h_width/5),height = int(self.cadre_h_height),
+            width= 10,height = 10,
             text="Construire Batiment",
-            font=('Helvetica 10 bold')
+            font=('Helvetica 8 bold')
+        )
+
+        self.bouton_cargo = tk.Button(self.cadre_outils_h, #Temporaire
+            text="Cargo",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_eclaireur = tk.Button(self.cadre_outils_h, #Temporaire
+            text="Eclaireur",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_combat = tk.Button(self.cadre_outils_h, #Temporaire
+            text="Combat",
+            font=('Helvetica 8 bold')
         )
 
         self.info_planete = tk.Canvas(
@@ -362,12 +375,20 @@ class VueHUD(Vue):
         )
 
     def load_menu_vaisseau(self):
-        pass
-    
+        self.ressources_vaisseau = self.info_planete.create_text(
+            self.cadre_v_width/2, 
+            self.cadre_v_height/11,
+            font=('Helvetica 10 bold'),
+            fill="white" 
+        )
+
     def afficher_menu_planete(self, planete: Planete):
-        self.bouton_batiment.pack(expand=False)
+        self.bouton_batiment.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_eclaireur.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_cargo.place(relx=0.42, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_combat.place(relx=0.53, rely=0.1, relwidth=0.1, relheight=0.8)
         self.update_info_planete(planete)
-        self.info_planete.pack(expand=False)
+        self.info_planete.pack()
 
     def afficher_menu_vaisseau(self):
         pass

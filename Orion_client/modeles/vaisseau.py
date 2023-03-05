@@ -59,27 +59,27 @@ class Vaisseau(ABC):
                 rep = self.arriver[type_obj]()
                 return rep
 
-    # def arriver_etoile(self):
-    #     self.parent.log.append(
-    #         ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
-    #     if not self.cible.proprietaire:
-    #         self.cible.proprietaire = self.proprietaire
-    #     cible = self.cible
-    #     self.cible = 0
-    #     return ["Etoile", cible]
+    def arriver_etoile(self):
+        self.parent.log.append(
+            ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
+        if not self.cible.proprietaire:
+            self.cible.proprietaire = self.proprietaire
+        cible = self.cible
+        self.cible = 0
+        return ["Etoile", cible]
 
-    # def arriver_porte(self):
-    #     self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
-    #     cible = self.cible
-    #     trou = cible.parent
-    #     if cible == trou.porte_a:
-    #         self.x = trou.porte_b.x + random.randrange(6) + 2
-    #         self.y = trou.porte_b.y
-    #     elif cible == trou.porte_b:
-    #         self.x = trou.porte_a.x - random.randrange(6) + 2
-    #         self.y = trou.porte_a.y
-    #     self.cible = 0
-    #     return ["Porte_de_ver", cible]
+    def arriver_porte(self):
+        self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
+        cible = self.cible
+        trou = cible.parent
+        if cible == trou.porte_a:
+            self.x = trou.porte_b.x + random.randrange(6) + 2
+            self.y = trou.porte_b.y
+        elif cible == trou.porte_b:
+            self.x = trou.porte_a.x - random.randrange(6) + 2
+            self.y = trou.porte_a.y
+        self.cible = 0
+        return ["Porte_de_ver", cible]
 
 
 class Cargo(Vaisseau):

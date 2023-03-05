@@ -188,7 +188,15 @@ class GestionnairePartie(GestionnaireVue):
         self.vueHUD.minimap_button.bind("<Button-1>",self.vueHUD.montrer_mini)
         self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
         self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
-        
+
+        self.vueHUD.bouton_combat.bind("<Button-1>", self.creer_vaisseau)
+        self.vueHUD.bouton_cargo.bind("<Button-1>", self.creer_vaisseau)
+        self.vueHUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
+
+    def creer_vaisseau(self, evt):
+        type_vaisseau = evt.widget.cget("text")
+        self.controleur.creer_vaisseau(type_vaisseau)
+
     def cosmos_clic(self,e):
 
         self.vueCosmos.centrer_clic(e)
