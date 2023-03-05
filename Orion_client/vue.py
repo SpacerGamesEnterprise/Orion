@@ -293,12 +293,82 @@ class VueHUD(Vue):
             font=('Helvetica 10 bold')
         )
 
+        self.info_planete = tk.Canvas(
+            self.cadre_outils_v, 
+            width= int(self.cadre_v_width), 
+            height = int(self.cadre_v_height), 
+            bg="black"
+        )
+
+        self.ressources_planete = self.info_planete.create_text(
+            self.cadre_v_width/2, 
+            self.cadre_v_height/11,
+            font=('Helvetica 10 bold'),
+            fill="white" 
+        )
+
+        self.info_sup_planete = self.info_planete.create_text(
+            self.cadre_v_width/2, 
+            self.cadre_v_height/2,
+            font=('Helvetica 10 bold'),
+            fill="white"
+        )
+
+        self.liste_batiments = self.info_planete.create_text(
+            self.cadre_v_width/2, 
+            self.cadre_v_height/5,
+            font=('Helvetica 10 bold'),
+            fill="white"
+        )
+
+
+    def update_info_planete(self, planete: Planete):
+        string_batiments: str = ""
+
+        for batiment in planete.batiments:
+            string_batiments = string_batiments  + "\n" + batiment.nom + " Niveau : " + str(batiment.niveau)
+
+        self.info_planete.itemconfig(self.liste_batiments,
+            text=" Batiments: " +  "\n" + string_batiments)
+
+        self.info_planete.itemconfig(self.info_sup_planete,
+            text=" Limite batiments: " + 
+                    str(len(planete.batiments)) + 
+                    "/" +
+                    str(planete.limite_batiment)
+                )
+        
+        self.info_planete.itemconfig(self.ressources_planete,
+            text=" Metal: " + 
+                str(planete.inventaire_ressources["metal"]) +
+                "/" +
+                str(planete.max_inventaire["metal"]) + 
+                "\n Bois: " +
+                str(planete.inventaire_ressources["bois"]) +
+                "/" +
+                str(planete.max_inventaire["bois"]) + 
+                "\n Energie: " +
+                str(planete.inventaire_ressources["energie"]) +
+                "/" +
+                str(planete.max_inventaire["energie"]) + 
+                "\n Nourriture: " +
+                str(planete.inventaire_ressources["nourriture"]) +
+                 "/" +
+                str(planete.max_inventaire["nourriture"]) + 
+                "\n Population: " +
+                str(planete.inventaire_ressources["population"]) +
+                 "/" +
+                str(planete.max_inventaire["population"]), 
+        )
+
     def load_menu_vaisseau(self):
         pass
     
-    def afficher_menu_planete(self):
+    def afficher_menu_planete(self, planete: Planete):
         self.bouton_batiment.pack(expand=False)
-    
+        self.update_info_planete(planete)
+        self.info_planete.pack(expand=False)
+
     def afficher_menu_vaisseau(self):
         pass
 

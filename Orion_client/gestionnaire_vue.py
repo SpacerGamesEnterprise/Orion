@@ -6,6 +6,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable
 
+from modeles.planete import Planete
+
 
 if TYPE_CHECKING:
     from controleur_serveur import Controleur
@@ -196,7 +198,7 @@ class GestionnairePartie(GestionnaireVue):
             if t[0] == self.controleur.mon_nom:  # et
                 self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
                 if t[2] == "Etoile":
-                    self.afficher_menu_planete()
+                    self.afficher_menu_planete(self.ma_selection)
                     #self.montrer_etoile_selection()
                 elif t[2] == "Flotte":
                     self.afficher_menu_vaisseau()
@@ -212,8 +214,14 @@ class GestionnairePartie(GestionnaireVue):
             self.ma_selection = None
             self.vueCosmos.canvas_cosmos.delete("marqueur")
 
-    def afficher_menu_planete(self):
-        self.vueHUD.afficher_menu_planete()
+    def afficher_menu_planete(self, info_click: list):
+        for joueur in self.controleur.modele.joueurs.keys():
+            if self.controleur.modele.joueurs[joueur].nom == info_click[0]:
+                for planete in self.controleur.modele.joueurs[joueur].etoilescontrolees:
+                    if planete.id == info_click[1]:
+                        planete_clique: Planete  = planete
+            
+        self.vueHUD.afficher_menu_planete(planete_clique)
     
     def afficher_menu_vaisseau(self):
         pass

@@ -3,6 +3,7 @@
 
 import ast
 import random
+from modeles.batiment import Usine
 from id import get_prochain_id
 from modeles.planete import Planete
 
@@ -247,6 +248,8 @@ class Modele():
             self.joueurs[i] = Joueur(self, i, etoile, couleurs.pop(0))
             x = etoile.x
             y = etoile.y
+            usine: Usine = Usine()
+            etoile.ajouter_batiment(usine)
             dist = 500
             for e in range(5):
                 x1 = random.randrange(x - dist, x + dist)
