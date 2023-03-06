@@ -5,6 +5,7 @@ avec le serveur.
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable
+from modeles.vaisseau import Vaisseau
 
 from modeles.planete import Planete
 
@@ -219,8 +220,8 @@ class GestionnairePartie(GestionnaireVue):
                 if t[2] == "Etoile":
                     self.afficher_menu_planete(self.ma_selection)
                     #self.montrer_etoile_selection()
-                elif t[2] == "Flotte":
-                    self.afficher_menu_vaisseau()
+                elif t[3] == "Vaisseau":
+                    self.afficher_menu_vaisseau(self.ma_selection)
                     #self.montrer_flotte_selection()
             elif ("Etoile" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
                 if self.ma_selection:
@@ -242,8 +243,8 @@ class GestionnairePartie(GestionnaireVue):
             
         self.vueHUD.afficher_menu_planete(planete_clique)
     
-    def afficher_menu_vaisseau(self):
-        pass
+    def afficher_menu_vaisseau(self, info_click: list):
+        self.vueHUD.afficher_menu_vaisseau(self.controleur.modele.joueurs[info_click[0]].flotte[info_click[2]][info_click[1]])
 
 
     def mini_clic(self,e):

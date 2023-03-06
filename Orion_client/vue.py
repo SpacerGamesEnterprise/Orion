@@ -6,6 +6,7 @@ import tkinter as tk
 
 from tkinter.simpledialog import *
 from tkinter.messagebox import *
+from modeles.vaisseau import Vaisseau
 from helper import Helper as hlp
 import math
 
@@ -375,14 +376,27 @@ class VueHUD(Vue):
         )
 
     def load_menu_vaisseau(self):
-        self.ressources_vaisseau = self.info_planete.create_text(
+
+        self.info_vaisseau = tk.Canvas(
+            self.cadre_outils_v, 
+            width= int(self.cadre_v_width), 
+            height = int(self.cadre_v_height), 
+            bg="black"
+        )
+
+        self.ressources_vaisseau = self.info_vaisseau.create_text(
             self.cadre_v_width/2, 
             self.cadre_v_height/11,
             font=('Helvetica 10 bold'),
             fill="white" 
         )
+        self.bouton_bouger = tk.Button(self.cadre_outils_h,
+            text="Bouger",
+            font=('Helvetica 8 bold')
+        )
 
     def afficher_menu_planete(self, planete: Planete):
+        self.cacher_menu_vaisseau()
         self.bouton_batiment.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_eclaireur.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_cargo.place(relx=0.42, rely=0.1, relwidth=0.1, relheight=0.8)
@@ -390,8 +404,21 @@ class VueHUD(Vue):
         self.update_info_planete(planete)
         self.info_planete.pack()
 
-    def afficher_menu_vaisseau(self):
-        pass
+    def afficher_menu_vaisseau(self, vaisseau: Vaisseau):
+        self.cacher_menu_planete()
+        self.bouton_bouger.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
+
+
+        
+    def cacher_menu_planete(self):
+        self.bouton_batiment.place_forget()
+        self.bouton_eclaireur.place_forget()
+        self.bouton_cargo.place_forget()
+        self.bouton_combat.place_forget()
+        self.info_planete.pack_forget()
+    
+    def cacher_menu_vaisseau(self):
+        self.bouton_bouger.place_forget()
 
     def afficher_info_joueur(self, nom: str):
         self.nom = self.cadre_info.create_text(
@@ -589,8 +616,6 @@ class VueCosmos(Vue):
         self.canvas_cosmos.xview_moveto(pctx)
         self.canvas_cosmos.yview_moveto(pcty)
 
-        print("x:",x,",y:",y,"\nbx:",self.background_x,",by:",self.background_y)
-
     def afficher_decor(self): # TODO: faire un truc plus propre
 
         # affichage des etoiles
@@ -633,17 +658,17 @@ class VueCosmos(Vue):
                     if k == "Combat":
                         self.canvas_cosmos.create_image((j.position.x - tailleF), (j.position.y - tailleF),
                             image= self.vaisseau_image,
-                            tags=(j.proprietaire, str(j.id), "Flotte", k, "Vaisseau")
+                            tags=(j.proprietaire, str(j.id), k, "Vaisseau")
                         )
                     if k == "Cargo":
                         self.canvas_cosmos.create_image((j.position.x - tailleF), (j.position.y - tailleF),
                             image= self.cargo_image,
-                            tags=(j.proprietaire, str(j.id), "Flotte", k, "Vaisseau")
+                            tags=(j.proprietaire, str(j.id), k, "Vaisseau")
                         )
                     if k == "Eclaireur":
                         self.canvas_cosmos.create_image((j.position.x - tailleF), (j.position.y - tailleF),
                             image= self.vaisseau_image,
-                            tags=(j.proprietaire, str(j.id), "Flotte", k, "Vaisseau")
+                            tags=(j.proprietaire, str(j.id), k, "Vaisseau")
                         )   
                     
                 
