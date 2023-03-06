@@ -259,7 +259,7 @@ class GestionnairePartie(GestionnaireVue):
         self.vueHUD.afficher_info_joueur(self.controleur.mon_nom)
         self.vueHUD.afficher_mini_cosmos()
         self.bind_controls()
-        self.game_frame.mainloop()
+        #self.game_frame.mainloop()
 
     
     def quitter(self):

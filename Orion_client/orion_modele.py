@@ -123,9 +123,11 @@ class Joueur():
         self.flotte = {"Eclaireur": {},
                        "Cargo": {},
                        "Combat": {}}
-        self.actions = {"ciblerflotte": self.ciblerflotte}
+        self.actions = {"ciblerflotte": self.ciblerflotte,
+                        "creervaisseau": self.creervaisseau}
 
     def creervaisseau(self, type_vaisseau): #TODO update hangar
+        type_vaisseau =  type_vaisseau[0]
         if type_vaisseau == "Cargo":
             v = Cargo(self.nom, Point(self.etoilemere.x + 10, self.etoilemere.y))
         elif type_vaisseau == "Eclaireur":
@@ -198,7 +200,7 @@ class IA(Joueur):
         self.avancer_flotte(1)
 
         if self.cooldown == 0:
-            v = self.creervaisseau(["Vaisseau"])
+            v = self.creervaisseau(["Eclaireur"])
             cible = random.choice(self.parent.etoiles)
             v.acquerir_cible(cible, "Etoile")
             self.cooldown = random.randrange(self.cooldownmax) + self.cooldownmax

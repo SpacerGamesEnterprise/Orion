@@ -48,13 +48,13 @@ class Vaisseau(ABC):
     def acquerir_cible(self, cible, type_cible):
         self.type_cible = type_cible
         self.cible = cible
-        self.angle_cible = hlp.calcAngle(self.x, self.y, self.cible.x, self.cible.y)
+        self.angle_cible = hlp.calcAngle(self.position.x, self.position.y, self.cible.x, self.cible.y)
 
     def avancer(self):
         if self.cible != 0:
             x = self.cible.x
             y = self.cible.y
-            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.x, self.y)
+            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.position.x, self.position.y)
             if hlp.calcDistance(self.x, self.y, x, y) <= self.vitesse:
                 type_obj = type(self.cible).__name__
                 rep = self.arriver[type_obj]()
