@@ -2,12 +2,16 @@ from abc import ABC
 from typing import cast
 
 import random
+import logging
 
 from modeles.position import Point, Vecteur
 from modeles.ressources import Ressources
 
 from id import get_prochain_id
 from helper import Helper as hlp
+
+def log(*args, **kwargs):
+    logging.debug(f"Event called. Args: {args}, Kwargs: {kwargs}")
 
 class Vaisseau(ABC):  
     """Classe parente des types de vaisseau"""
@@ -30,8 +34,11 @@ class Vaisseau(ABC):
         #self.angle_cible = 0
         self.mouvement = Vecteur(0, 0)
         """Vecteur de la position actuelle vers la cible"""
-        #self.arriver = {"Etoile": self.arriver_etoile,
-                        #"Porte_de_vers": self.arriver_porte}
+        self.arriver = {
+            None: log,
+            "Etoile": self.arriver_etoile,
+            "Porte_de_vers": self.arriver_porte,
+        }
                         
                         
     def ameliorer(self, inventaire_planete: Ressources) -> Ressources:
