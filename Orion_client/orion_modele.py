@@ -137,6 +137,9 @@ class Joueur():
         self.flotte[type_vaisseau][v.id] = v
         #if self.nom == self.parent.parent.mon_nom:
             #self.parent.parent.lister_objet(type_vaisseau, v.id)
+
+        self.parent.parent.gestionnaire_partie.vueCosmos.afficher_vaisseau()
+        
         return v
 
 
