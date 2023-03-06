@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from turtle import update
 from typing import TYPE_CHECKING, Callable
 from enum import Enum
+from Orion_client.modeles.batiment import Centrale, Defense, Eglise, Ferme, Hangar, Laboratoire, Mine, Scierie
 from modeles.vaisseau import Vaisseau
 from modeles.planete import Planete
 
@@ -223,7 +224,14 @@ class GestionnairePartie(GestionnaireVue):
         self.vue_HUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
         self.vue_HUD.bouton_conquerir.bind("<Button-1>",self.conquerir)
         self.vue_HUD.bouton_batiment.bind("<Button-1>", self.vue_HUD.afficher_menu_batiments)
-
+        self.vue_HUD.bouton_defense.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Defense()))
+        self.vue_HUD.bouton_ferme.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Ferme()))
+        self.vue_HUD.bouton_centrale.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Centrale()))
+        self.vue_HUD.bouton_mine.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Mine()))
+        self.vue_HUD.bouton_hangar.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Hangar()))
+        self.vue_HUD.bouton_laboratoire.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Laboratoire()))
+        self.vue_HUD.bouton_scierie.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Scierie()))
+        self.vue_HUD.bouton_eglise.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Eglise()))
     def bouger_vaisseau(self,e):
         self.etat_clic = EtatClic.BOUGER_VAISSEAU
         v_select = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
