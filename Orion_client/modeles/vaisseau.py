@@ -36,7 +36,7 @@ class Vaisseau(ABC):
         """Vecteur de la position actuelle vers la cible"""
         self.arriver = {
             None: log,
-            "Etoile": log, #self.arriver_etoile,
+            "Planete": log, #self.arriver_planete,
             "Porte_de_vers": log, #self.arriver_porte,
         }
                         
@@ -56,8 +56,8 @@ class Vaisseau(ABC):
             return self.avancer()
         elif trouver_nouveau:
             # NOTE: Accéder au parent est très mal
-           # cible = random.choice(self.parent.parent.etoiles)
-            #self.acquerir_cible(cible, "Etoile")
+           # cible = random.choice(self.parent.parent.planetes)
+            #self.acquerir_cible(cible, "Planete")
             pass
 
     def acquerir_cible(self, cible, type_cible):
@@ -74,15 +74,15 @@ class Vaisseau(ABC):
                 self.cible = None
                 return self.arriver[self.type_cible]()
 
-    def arriver_etoile(self):
+    def arriver_planete(self):
         # NOTE: Accéder au parent est très mal
         self.parent.log.append(
-            ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
+            ["Arrive:", self.parent.parent.cadre_courant, "Planete", self.id, self.cible.id, self.cible.proprietaire])
         if not self.cible.proprietaire:
             self.cible.proprietaire = self.proprietaire
         cible = self.cible
         self.cible = 0
-        return ["Etoile", cible]
+        return ["Planete", cible]
 
     def arriver_porte(self):
         # NOTE: Accéder au parent est très mal

@@ -94,7 +94,7 @@ class VueSplash(Vue):
             highlightthickness=0)
             
         self.background_img = img_resize(
-            "Orion_client/graphics/menuBackground.png", (self.background_width,
+            getimg("menuBackground.png"), (self.background_width,
                                         self.background_height)
         )
         self.background = self.main_canvas.create_image(
@@ -177,7 +177,7 @@ class VueLobby(Vue):
             height=self.background_height,
             highlightthickness=0)
         self.background_img = img_resize(
-            "Orion_client/graphics/menuBackground.png",
+            getimg("menuBackground.png"),
             (2000,2000)
         )
 
@@ -240,11 +240,11 @@ class VueHUD(Vue):
             master.geometry(f"{self.background_width}x{self.background_height}")
     
         self.minimap_button_img = img_resize(
-            "Orion_client/graphics/minimapButton.png",
+            getimg("minimapButton.png"),
             (self.button_size,self.button_size)
         )
         self.minimap_background_img = img_resize(
-            "Orion_client/graphics/gameBackground.png",
+            getimg("gameBackground.png"),
             (self.minimap_size,self.minimap_size)
         )
 
@@ -651,15 +651,15 @@ class VueCosmos(Vue):
     def load_images(self):
        
         self.background_image = img_resize(
-            "Orion_client/graphics/gameBackground.png",
+            getimg("gameBackground.png"),
             (self.max_map_size,self.max_map_size)
         )
         self.cargo_image = img_resize(
-            "Orion_client/graphics/image_vaisseau/Cargo.png",
+            getimg("image_vaisseau", "Cargo.png"),
             (self.planet_diameter,self.planet_diameter)
         )
         self.vaisseau_image = img_resize(
-            "Orion_client/graphics/image_vaisseau/Combat.png",
+            getimg("image_vaisseau", "Combat.png"),
             (self.planet_diameter,self.planet_diameter)
         )
         self.load_planet_images()
@@ -672,19 +672,19 @@ class VueCosmos(Vue):
         for i in range(0,self.n_planet_variation+1):
             dia = self.planet_diameter+self.planet_diameter_variation*i
             self.planete_image.append( planet_resize(
-                "Orion_client/graphics/planet.png",
+                getimg("planet.png"),
                 (dia,dia)
             ))
             self.planete_ai_image.append(planet_resize(
-                "Orion_client/graphics/planetAI.png",
+                getimg("planetAI.png"),
                 (dia,dia)
             ))
             self.planete_orange_image.append(planet_resize(
-                "Orion_client/graphics/planetOrange.png",
+                getimg("planetOrange.png"),
                 (dia,dia)
             ))
             self.planete_rouge_image.append( planet_resize(
-                "Orion_client/graphics/planetRed.png",
+                getimg("planetRed.png"),
                 (dia,dia)
             ))
     

@@ -293,13 +293,13 @@ class GestionnairePartie(GestionnaireVue):
                 self.vue_cosmos.canvas_cosmos.delete("marqueur")
 
     def afficher_menu_planete(self, info_click: list):
-        for joueur in self.modele.joueurs.keys():
-            if self.modele.joueurs[joueur].nom == info_click[0]:
-                for planete in self.modele.joueurs[joueur].planetes_controlees:
-                    if planete.id == info_click[1]:
-                        planete_clique: Planete  = planete
-            
-        self.vue_HUD.afficher_menu_planete(planete_clique)
+        joueur = self.modele.joueurs[self.ma_selection[0]]
+        planete_select = [
+            planete
+            for planete in joueur.planetes_controlees
+            if planete.id == self.ma_selection[1]
+        ][0]
+        self.vue_HUD.afficher_menu_planete(planete_select)
     
     def afficher_menu_vaisseau(self, info_click: list):
         self.vue_HUD.afficher_menu_vaisseau(self.modele.joueurs[info_click[0]].flotte[info_click[2]][info_click[1]])

@@ -199,7 +199,6 @@ class Modele():
                       "SeaGreen1", "turquoise1", "firebrick1"]
         for i in range(ias):
             self.joueurs["IA_" + str(i)] = IA(self, "IA_" + str(i), planete_occupee.pop(0), couleursia.pop(0))
-        print(self.joueurs)
 
     ##############################################################################
     def jouer_prochain_coup(self, cadre):
