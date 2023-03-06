@@ -212,7 +212,7 @@ class GestionnairePartie(GestionnaireVue):
         self.vue_HUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
         self.vue_HUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
         self.vue_HUD.bouton_conquerir.bind("<Button-1>",self.conquerir_vaisseau)
-        #self.vueHUD.bouton_batiment.bind("<Button-1>", self.construire_batiment)
+        self.vue_HUD.bouton_batiment.bind("<Button-1>", self.vue_HUD.afficher_menu_batiments)
 
     def bouger_vaisseau(self,e):
         self.etat_clic = EtatClic.BOUGER_VAISSEAU

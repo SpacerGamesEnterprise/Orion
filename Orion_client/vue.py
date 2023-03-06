@@ -294,8 +294,9 @@ class VueHUD(Vue):
 
         self.load_menu_planete()
         self.load_menu_vaisseau()
+        self.load_menu_batiment()
         
-    def load_menu_batiment(self.):
+    def load_menu_batiment(self):
         self.bouton_mine = tk.Button(self.cadre_outils_h,
             width= 10,height = 10,
             text="Mine",
@@ -476,28 +477,54 @@ class VueHUD(Vue):
 
     def afficher_menu_planete(self, planete: Planete):
         self.cacher_menu_vaisseau()
+        self.cacher_menu_batiment()
         self.bouton_batiment.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_eclaireur.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_cargo.place(relx=0.42, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_combat.place(relx=0.53, rely=0.1, relwidth=0.1, relheight=0.8)
         self.update_info_planete(planete)
         self.info_planete.pack()
+        
+    def afficher_menu_batiments(self, planete: Planete):
+        self.cacher_menu_vaisseau()
+        self.cacher_menu_planete()
+        self.bouton_defense.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_ferme.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_centrale.place(relx=0.42, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_mine.place(relx=0.53, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_hangar.place(relx=0.64, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_laboratoire.place(relx=0.75, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_scierie.place(relx=0.86, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_eglise.place(relx=0.97, rely=0.1, relwidth=0.1, relheight=0.8)
+
+        self.update_info_planete(planete)
+        self.info_planete.pack()
 
     def afficher_menu_vaisseau(self, vaisseau: Vaisseau):
         self.cacher_menu_planete()
+        self.cacher_menu_batiment()
         self.bouton_bouger.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_conquerir.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.update_info_vaisseau(vaisseau)
         self.info_vaisseau.pack()
 
-
-        
     def cacher_menu_planete(self):
         self.bouton_batiment.place_forget()
         self.bouton_eclaireur.place_forget()
         self.bouton_cargo.place_forget()
         self.bouton_combat.place_forget()
         self.info_planete.pack_forget()
+        
+    def cacher_menu_batiment(self):
+        self.bouton_defense.place_forget()
+        self.bouton_ferme.place_forget()
+        self.bouton_centrale.place_forget()
+        self.bouton_mine.place_forget()
+        self.bouton_hangar.place_forget()
+        self.bouton_laboratoire.place_forget()
+        self.bouton_scierie.place_forget()
+        self.bouton_eglise.place_forget()
+
     
     def cacher_menu_vaisseau(self):
         self.bouton_bouger.place_forget()
