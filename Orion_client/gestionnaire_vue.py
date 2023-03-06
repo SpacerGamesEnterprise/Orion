@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 import tkinter as tk
 
 from vue import Vue, VueSplash, VueLobby,VueCosmos,VueHUD
-from orion_modele import Modele
+from orion_modele import Modele, Point
 
 class EtatClic(Enum):
     DEFAULT = 0 
@@ -206,6 +206,11 @@ class GestionnairePartie(GestionnaireVue):
 
     def bouger_vaisseau(self,e):
         self.etatClic = EtatClic.BOUGER_VAISSEAU
+        v_select = self.controleur.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
+        self.depart_x = v_select.position.x
+        self.depart_y = v_select.position.y
+
+        
 
     def creer_vaisseau(self, evt):
         type_vaisseau = evt.widget.cget("text")
@@ -215,13 +220,12 @@ class GestionnairePartie(GestionnaireVue):
     def cosmos_clic(self,e):
         
         if(self.etatClic == EtatClic.BOUGER_VAISSEAU):
+            v_select = self.controleur.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
+
             destination_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
             destination_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
 
-            move_x = destination_x - self.centre_ecran_canvas_x
-            move_y = destination_y - self.centre_ecran_canvas_y
-
-            self.vueCosmos.bouger_vaisseau(self.ma_selection[1],move_x,move_y)
+            v_select.cible = Point(destination_x,destination_y)
 
             self.etatClic = EtatClic.DEFAULT
 
