@@ -1,16 +1,16 @@
 import random
+from modeles.position import Point
 from modeles.batiment import Batiment
 from modeles.ressources import Ressources
 from id import get_prochain_id
 
 
 class Planete():
-    def __init__(self, x, y):
+    def __init__(self, position: Point):
         self.id = get_prochain_id()
         #self.parent = parent
         self.proprietaire = ""
-        self.x = x
-        self.y = y
+        self.position = position
         self.taille = random.randrange(4, 8)
         self.ressources_disponibles = Ressources(
             metal=random.randrange(1_000, 10_000_000),

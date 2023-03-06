@@ -128,17 +128,19 @@ class Joueur():
 
     def creervaisseau(self, type_vaisseau): #TODO update hangar
         type_vaisseau =  type_vaisseau[0]
+        x, y = self.etoilemere.position
+        position = Point(x + 10, y)
         if type_vaisseau == "Cargo":
-            v = Cargo(self.nom, Point(self.etoilemere.x + 10, self.etoilemere.y))
+            v = Cargo(self.nom, position)
         elif type_vaisseau == "Eclaireur":
-            v = Eclaireur(self.nom, Point(self.etoilemere.x + 10, self.etoilemere.y))
+            v = Eclaireur(self.nom, position)
         else:
-            v = Combat(self.nom, Point(self.etoilemere.x + 10, self.etoilemere.y))
+            v = Combat(self.nom, position)
         self.flotte[type_vaisseau][v.id] = v
         #if self.nom == self.parent.parent.mon_nom:
             #self.parent.parent.lister_objet(type_vaisseau, v.id)
 
-        self.parent.parent.gestionnaire_partie.vueCosmos.afficher_vaisseau()
+        self.parent.parent.gestionnaire_partie.vue_cosmos.afficher_vaisseau()
         
         return v
 
@@ -194,6 +196,7 @@ class IA(Joueur):
         self.cooldown = 20
 
     def jouer_prochain_coup(self):
+        return
         # for i in self.flotte:
         #     for j in self.flotte[i]:
         #         j=self.flotte[i][j]
@@ -240,7 +243,7 @@ class Modele():
         for i in range(self.nb_etoiles):
             x = random.randrange(self.largeur - (2 * bordure)) + bordure
             y = random.randrange(self.hauteur - (2 * bordure)) + bordure
-            self.etoiles.append(Planete(x, y))
+            self.etoiles.append(Planete(Point(x, y)))
         np = len(joueurs) + ias
         etoile_occupee = []
         while np:
@@ -255,15 +258,14 @@ class Modele():
         for i in joueurs:
             etoile = etoile_occupee.pop(0)
             self.joueurs[i] = Joueur(self, i, etoile, couleurs.pop(0))
-            x = etoile.x
-            y = etoile.y
+            x, y = etoile.position
             usine: Usine = Usine()
             etoile.ajouter_batiment(usine)
             dist = 500
             for e in range(5):
                 x1 = random.randrange(x - dist, x + dist)
                 y1 = random.randrange(y - dist, y + dist)
-                self.etoiles.append(Planete(x1, y1))
+                self.etoiles.append(Planete(Point(x1, y1)))
 
         # IA- creation des ias
         couleursia = ["orange", "green", "cyan",

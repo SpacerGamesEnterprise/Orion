@@ -1,9 +1,17 @@
 from abc import ABC
+from typing import cast
+
 import random
-from id import get_prochain_id
+import logging
+
+from modeles.position import Point, Vecteur
 from modeles.ressources import Ressources
+
+from id import get_prochain_id
 from helper import Helper as hlp
-from modeles.position import Point
+
+def log(*args, **kwargs):
+    logging.debug(f"Event called. Args: {args}, Kwargs: {kwargs}")
 
 class Vaisseau(ABC):  
     """Classe parente des types de vaisseau"""
@@ -16,51 +24,58 @@ class Vaisseau(ABC):
         self.cargo: Ressources = Ressources()
         self.espace_cargo: Ressources = Ressources()
         self.taille: int = 5
-        self.vitesse: int = 2
+        self.vitesse: int = 20
         self.nom_vaisseau: str = ""
         self.niveau: int = 1
         self.cout_construction: Ressources = Ressources()
 
-        self.cible = 0
+        self.cible: Point = None
         self.type_cible = None
-        self.angle_cible = 0
-        #self.arriver = {"Etoile": self.arriver_etoile,
-                        #"Porte_de_vers": self.arriver_porte}
+        #self.angle_cible = 0
+        self.mouvement = Vecteur(0, 0)
+        """Vecteur de la position actuelle vers la cible"""
+        self.arriver = {
+            None: log,
+            "Etoile": log, #self.arriver_etoile,
+            "Porte_de_vers": log, #self.arriver_porte,
+        }
                         
                         
     def ameliorer(self, inventaire_planete: Ressources) -> Ressources:
-        """Retourne l'inventaire de la planete et augmente le niveau du vaissseau"""
-        if inventaire_planete.has_more(self.cout_construction + self.cout_construction):
-            self.cout_construction += self.cout_construction        
+        """Retourne l'inventaire de la planète et augmente
+        le niveau du vaissseau
+        """
+        if inventaire_planete.has_more(2 * self.cout_construction):
+            self.cout_construction *= 2        
             inventaire_planete -= self.cout_construction
             self.niveau += 1
         return inventaire_planete      
-    
-                            
 
     def jouer_prochain_coup(self, trouver_nouveau=0):
-        if self.cible != 0:
+        if self.cible is not None:
             return self.avancer()
         elif trouver_nouveau:
-            cible = random.choice(self.parent.parent.etoiles)
-            self.acquerir_cible(cible, "Etoile")
+            # NOTE: Accéder au parent est très mal
+           # cible = random.choice(self.parent.parent.etoiles)
+            #self.acquerir_cible(cible, "Etoile")
+            pass
 
     def acquerir_cible(self, cible, type_cible):
         self.type_cible = type_cible
-        self.cible = cible
-        self.angle_cible = hlp.calcAngle(self.position.x, self.position.y, self.cible.x, self.cible.y)
+        self.cible = cible.position
 
     def avancer(self):
-        if self.cible != 0:
-            x = self.cible.x
-            y = self.cible.y
-            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.position.x, self.position.y)
-            if hlp.calcDistance(self.x, self.y, x, y) <= self.vitesse:
-                type_obj = type(self.cible).__name__
-                rep = self.arriver[type_obj]()
-                return rep
+        """Avance le vaisseau vers sa cible selon sa vitesse."""
+        if self.cible is not None:
+            vec_total = self.cible - self.position
+            mouvement = vec_total.clamp(self.vitesse)
+            self.position += mouvement
+            if vec_total.norm <= self.vitesse:
+                self.cible = None
+                return self.arriver[self.type_cible]()
 
     def arriver_etoile(self):
+        # NOTE: Accéder au parent est très mal
         self.parent.log.append(
             ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
         if not self.cible.proprietaire:
@@ -70,6 +85,7 @@ class Vaisseau(ABC):
         return ["Etoile", cible]
 
     def arriver_porte(self):
+        # NOTE: Accéder au parent est très mal
         self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
         cible = self.cible
         trou = cible.parent

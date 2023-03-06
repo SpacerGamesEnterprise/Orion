@@ -73,38 +73,87 @@ class Vecteur(complex):
         return self.__class__(super().__pos__(*args, **kwargs))
 
     def __iter__(self) -> Iterator:
-        return iter(self.get_coordonnee())
+        return iter(self.get_coords())
 
     def conjugate(self):
         return self.__class__(super().conjugate())
 
     @property
-    def norme(self) -> float:
+    def norm(self) -> float:
         """Retourne ou modifie la norme du vecteur sans changer sa
         direction.
         """
         return abs(self)
 
-    def asnorm(self, value: float):
+    def rescale(self, value: float):
         """Retourne un nouveau vecteur avec la norme spécifiée et la
         même direction.
         """
-        if self.norme:
-            return self.__class__(*(self * value / self.norme))
+        if self.norm:
+            return self.__class__(*(self * value / self.norm))
         else:
             return self
 
-    def unitaire(self):
+    def normalize(self):
         """Retourne un vecteur unitaire dans la direction du vecteur."""
-        return self / self.norme
+        return self / self.norm
     
     def rotate(self, angle: float):
         """Retourne un vecteur avec une rotation appliquée."""
         return self * complex(math.cos(angle), math.sin(angle))
 
-    def get_coordonnee(self) -> tuple[float, float]:
+    def get_coords(self) -> tuple[float, float]:
         """Retourne les coordonnées du Point en tuple."""
         return (self.real, self.imag)
+
+    # It's not pretty, but without return self, the overload has the
+    # wrong return type.
+    @overload
+    def clamp(self, *, max_length: float): return self
+
+    @overload
+    def clamp(self, *, min_length: float): return self
+
+    @overload
+    def clamp(self, *, min_length: float, max_length: float): return self
+
+    @overload
+    def clamp(self, max_length: float, /): return self
+
+    @overload
+    def clamp(self, min_length: float, max_length: float, /): return self
+
+    def clamp(self, *args, **kwargs):
+        """Retourne un nouveau vecteur avec une norme limitée entre
+        les valeurs spécifiées.
+        """
+        if len(args) == 1:
+            # Un seul argument, on le considère comme max_length
+            min_length, max_length = 0, args[0]
+        elif len(args) == 2:
+            # Deux arguments, on les considère comme min_length et max_length
+            min_length, max_length = args
+        elif len(args) > 2:
+            raise TypeError("clamp() takes 1 or 2 positional arguments but 3 were given")
+
+        if not args:
+            min_length = kwargs.get("min_length", 0)
+            max_length = kwargs.get("max_length", float("inf"))
+
+        if min_length == 0 and max_length == float("inf"):
+            raise TypeError("clamp() missing 1 required positional argument: 'max_length'")
+
+        if min_length > max_length:
+            raise ValueError("min_length must be less than or equal to max_length")
+
+        if self.norm < min_length:
+            ret = self.rescale(min_length)
+        elif self.norm > max_length:
+            ret = self.rescale(max_length)
+        else:
+            ret = self
+        return ret
+        
 
     @classmethod
     def zero(cls):
