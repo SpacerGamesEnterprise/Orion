@@ -295,6 +295,48 @@ class VueHUD(Vue):
         self.load_menu_planete()
         self.load_menu_vaisseau()
         
+    def load_menu_batiment(self.):
+        self.bouton_mine = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Mine",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_scierie = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Scierie",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_eglise = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Eglise",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_ferme = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Ferme",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_centrale = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Centrale",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_defense = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Defense",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_hangar = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Hangar",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_laboratoire = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Laboratoire",
+            font=('Helvetica 8 bold')
+        )
+        
     def load_menu_planete(self):
         self.bouton_batiment = tk.Button(self.cadre_outils_h,
             width= 10,height = 10,
@@ -426,6 +468,11 @@ class VueHUD(Vue):
             text="Bouger",
             font=('Helvetica 8 bold')
         )
+        
+        self.bouton_conquerir = tk.Button(self.cadre_outils_h,
+            text="Conquerir",
+            font=('Helvetica 8 bold')
+        )
 
     def afficher_menu_planete(self, planete: Planete):
         self.cacher_menu_vaisseau()
@@ -439,6 +486,7 @@ class VueHUD(Vue):
     def afficher_menu_vaisseau(self, vaisseau: Vaisseau):
         self.cacher_menu_planete()
         self.bouton_bouger.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.bouton_conquerir.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.update_info_vaisseau(vaisseau)
         self.info_vaisseau.pack()
 
@@ -453,6 +501,9 @@ class VueHUD(Vue):
     
     def cacher_menu_vaisseau(self):
         self.bouton_bouger.place_forget()
+        self.bouton_conquerir.place_forget()
+        self.info_vaisseau.pack_forget()
+
 
     def afficher_info_joueur(self, nom: str):
         self.nom = self.cadre_info.create_text(
@@ -696,6 +747,13 @@ class VueCosmos(Vue):
                     self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_rouge_image[size_randomizer],
                         tags=(j.proprietaire, str(j.id), "Etoile")
+                    )
+
+    def coloniser(self, planete):
+        size_randomizer =random.randint(0,self.n_planet_variation)
+        self.canvas_cosmos.create_image(*planete.position,
+                        image= self.planete_rouge_image[size_randomizer],
+                        tags=(planete.proprietaire, str(planete.id), "Etoile")
                     )
 
     def afficher_vaisseau(self):
