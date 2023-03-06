@@ -56,9 +56,9 @@ def planet_resize(file:str,dimensions:tuple[int,int]) -> tk.PhotoImage:
     
     return ImageTk.PhotoImage(img)
 
-def getimg(name: str) -> str:
+def getimg(*path: str) -> str:
     """Retourne le liens vers l'image demandée"""
-    return os.path.join(os.path.dirname(__file__), "graphics", name)
+    return os.path.join(os.path.dirname(__file__), "graphics", *path)
 
 class Vue(ABC):
     def __init__(self, master: tk.Widget):
