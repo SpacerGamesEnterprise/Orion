@@ -67,7 +67,6 @@ class Joueur():
         self.flotte[type_vaisseau][v.id] = v
         #if self.nom == self.parent.parent.mon_nom:
             #self.parent.parent.lister_objet(type_vaisseau, v.id)
-
         self.parent.parent.gestionnaire_partie.vue_cosmos.afficher_vaisseau()
         
         return v
@@ -219,13 +218,16 @@ class Modele():
 
         # demander aux objets de jouer leur prochain coup
         # aux joueurs en premier
-        for i in self.joueurs:
-            self.joueurs[i].jouer_prochain_coup()
+        for joueur in self.joueurs:
+            self.joueurs[joueur].jouer_prochain_coup()
+            for planete in self.joueurs[joueur].etoilescontrolees:
+                planete.produire_ressources()
 
         # NOTE si le modele (qui représent.keyse l'univers !!! )
         #      fait des actions - on les activera ici...
         for i in self.trou_de_vers:
             i.jouer_prochain_coup()
+            
 
     def creer_bibittes_spatiales(self, nb_biittes=0):
         pass

@@ -2,6 +2,7 @@
 ##  version 2022 14 mars - jmd
 ##  version  janvier 2023
 #     enlever import inutile
+from turtle import position
 from typing import Any, Literal
 
 import json
@@ -209,7 +210,7 @@ class Controleur():
         """Boucle principale du jeu"""
         # TODO: Understand this
         self.cadrejeu += 1  # Increment le compteur de boucle de jeu
-
+        
         if self.cadrejeu % self.moduloappeler_serveur == 0:  # appel périodique au serveur
             if self.actionsrequises:
                 actions = self.actionsrequises

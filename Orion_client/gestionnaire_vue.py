@@ -4,6 +4,7 @@ avec le serveur.
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from turtle import update
 from typing import TYPE_CHECKING, Callable
 from enum import Enum
 from modeles.vaisseau import Vaisseau
@@ -192,6 +193,15 @@ class GestionnairePartie(GestionnaireVue):
         self.root.geometry(f"{self.vue_HUD.background_width}x{self.vue_HUD.background_height}")
 
     def update_jeu(self):
+        if self.ma_selection is not None:
+            if self.ma_selection[2] == "Etoile":
+                joueur = self.modele.joueurs[self.ma_selection[0]]
+                planete_select = [
+                    planete
+                    for planete in joueur.etoilescontrolees
+                    if planete.id == self.ma_selection[1]
+                ][0]
+                self.vue_HUD.update_info_planete(planete_select)
         """Mise à jour de la vue du jeu."""
         for joueur in self.modele.joueurs.values():
             for vaisseaumap in joueur.flotte.values():
@@ -218,7 +228,7 @@ class GestionnairePartie(GestionnaireVue):
         self.etat_clic = EtatClic.BOUGER_VAISSEAU
         v_select = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
 
-    def conquerir(self, e):
+    def conquerir(self, e): # TODO: use tags
         for planete in self.modele.etoiles:
             pos_vaisseau = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]].position
             if pos_vaisseau.y - 100 < planete.position.y < pos_vaisseau.y + 100:
