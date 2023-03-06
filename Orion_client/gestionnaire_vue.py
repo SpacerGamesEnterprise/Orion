@@ -194,11 +194,11 @@ class GestionnairePartie(GestionnaireVue):
 
     def update_jeu(self):
         if self.ma_selection is not None:
-            if self.ma_selection[2] == "Etoile":
+            if self.ma_selection[2] == "Planete":
                 joueur = self.modele.joueurs[self.ma_selection[0]]
                 planete_select = [
                     planete
-                    for planete in joueur.etoilescontrolees
+                    for planete in joueur.planetes_controlees
                     if planete.id == self.ma_selection[1]
                 ][0]
                 self.vue_HUD.update_info_planete(planete_select)
@@ -229,14 +229,14 @@ class GestionnairePartie(GestionnaireVue):
         v_select = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
 
     def conquerir(self, e): # TODO: use tags
-        for planete in self.modele.etoiles:
+        for planete in self.modele.planetes:
             pos_vaisseau = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]].position
             if pos_vaisseau.y - 100 < planete.position.y < pos_vaisseau.y + 100:
                 if pos_vaisseau.x - 100 < planete.position.x < pos_vaisseau.x + 100:
                     if planete.proprietaire == "":
                         planete.proprietaire = self.modele.joueurs[self.ma_selection[0]].nom
-                        self.modele.etoiles.remove(planete)
-                        self.modele.joueurs[self.ma_selection[0]].etoilescontrolees.append(planete)
+                        self.modele.planetes.remove(planete)
+                        self.modele.joueurs[self.ma_selection[0]].planetes_controlees.append(planete)
                         self.vue_cosmos.coloniser(planete)
 
 
@@ -275,13 +275,13 @@ class GestionnairePartie(GestionnaireVue):
             if t:  # il y a des tags
                 if t[0] == self.controleur.mon_nom:  # et
                     self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
-                    if t[2] == "Etoile":
+                    if t[2] == "Planete":
                         self.afficher_menu_planete(self.ma_selection)
                         #self.montrer_etoile_selection()
                     elif t[3] == "Vaisseau":
                         self.afficher_menu_vaisseau(self.ma_selection)
                         #self.montrer_flotte_selection()
-                elif ("Etoile" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
+                elif ("Planete" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
                     if self.ma_selection:
                         #self.parent.cibler_flotte(self.ma_selection[1], t[1], t[2])
                         pass
@@ -295,7 +295,7 @@ class GestionnairePartie(GestionnaireVue):
     def afficher_menu_planete(self, info_click: list):
         for joueur in self.modele.joueurs.keys():
             if self.modele.joueurs[joueur].nom == info_click[0]:
-                for planete in self.modele.joueurs[joueur].etoilescontrolees:
+                for planete in self.modele.joueurs[joueur].planetes_controlees:
                     if planete.id == info_click[1]:
                         planete_clique: Planete  = planete
             

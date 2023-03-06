@@ -539,22 +539,22 @@ class VueHUD(Vue):
         )
 
     def afficher_mini_cosmos(self):  # univers(self, mod):
-        for j in self.modele.etoiles:
+        for j in self.modele.planetes:
             minix = j.position.x / self.modele.largeur * self.minimap_size
             miniy = j.position.y / self.modele.hauteur * self.minimap_size
             self.minimap.create_rectangle(
                 minix, miniy, minix + 3, miniy + 3,
                 fill="#FFFFFF",
-                tags=("mini", "Etoile")
+                tags=("mini", "Planete")
             )
         for i in self.modele.joueurs.keys():
-            for j in self.modele.joueurs[i].etoilescontrolees:
+            for j in self.modele.joueurs[i].planetes_controlees:
                 minix = j.position.x / self.modele.largeur * self.minimap_size
                 miniy = j.position.y / self.modele.hauteur * self.minimap_size
                 self.minimap.create_rectangle(
                     minix, miniy, minix + 5, miniy + 5,
                     fill=self.modele.joueurs[i].couleur,
-                    tags=(j.proprietaire, str(j.id), "Etoile")
+                    tags=(j.proprietaire, str(j.id), "Planete")
                 )
     
     def mini_clic(self,e):
@@ -743,44 +743,44 @@ class VueCosmos(Vue):
 
     def afficher_decor(self): # TODO: faire un truc plus propre
     
-        # affichage des etoiles
-        for i in self.modele.etoiles:
+        # affichage des planetes
+        for i in self.modele.planetes:
             size_randomizer =random.randint(0,self.n_planet_variation)
             self.canvas_cosmos.create_image(*i.position,
                 image=self.planete_image[size_randomizer],
-                tags=(i.proprietaire, str(i.id), "Etoile",)
+                tags=(i.proprietaire, str(i.id), "Planete",)
             )
-        # affichage des etoiles possedees par les joueurs
+        # affichage des planetes possedees par les joueurs
         for i in self.modele.joueurs.keys():
-            for j in self.modele.joueurs[i].etoilescontrolees:
+            for j in self.modele.joueurs[i].planetes_controlees:
                 size_randomizer =random.randint(0,self.n_planet_variation)
                 
                 #si la planète/étoile affiché appartient à un AI
                 if(str(i)[0:2] == "IA"):
                     self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_ai_image[size_randomizer],
-                        tags=(j.proprietaire, str(j.id), "Etoile")
+                        tags=(j.proprietaire, str(j.id), "Planete")
                     )
                     self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_orange_image[size_randomizer],
-                        tags=(j.proprietaire, str(j.id), "Etoile")
+                        tags=(j.proprietaire, str(j.id), "Planete")
                     ) 
                 #si la planète/étoile affiché appartient à un Joueur
                 else:
                     self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_image[size_randomizer],
-                        tags=(j.proprietaire, str(j.id), "Etoile")
+                        tags=(j.proprietaire, str(j.id), "Planete")
                     )
                     self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_rouge_image[size_randomizer],
-                        tags=(j.proprietaire, str(j.id), "Etoile")
+                        tags=(j.proprietaire, str(j.id), "Planete")
                     )
 
     def coloniser(self, planete):
         size_randomizer =random.randint(0,self.n_planet_variation)
         self.canvas_cosmos.create_image(*planete.position,
                         image= self.planete_rouge_image[size_randomizer],
-                        tags=(planete.proprietaire, str(planete.id), "Etoile")
+                        tags=(planete.proprietaire, str(planete.id), "Planete")
                     )
 
     def afficher_vaisseau(self):
@@ -814,4 +814,4 @@ class VueCosmos(Vue):
                 #miniy = j.y / self.modele.hauteur * self.taille_minimap
                 #self.canevas_minimap.create_rectangle(minix, miniy, minix + 3, miniy + 3,
                 #                                      fill=mod.joueurs[i].couleur,
-                #                                      tags=(j.proprietaire, str(j.id), "Etoile"))
+                #                                      tags=(j.proprietaire, str(j.id), "Planete"))

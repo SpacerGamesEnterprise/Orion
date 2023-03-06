@@ -322,8 +322,8 @@ class Controleur():
             [self.mon_nom, "ciblerflotte", [idorigine, iddestination, type_cible]]
         )
 
-    def afficher_etoile(self, joueur: str, cible: str) -> None:
-        self.gestionnaire_splash.afficher_etoile(joueur, cible)
+    def afficher_planete(self, joueur: str, cible: str) -> None:
+        self.gestionnaire_splash.afficher_planete(joueur, cible)
 
     def lister_objet(self, objet: str, id: str) -> None:
         self.gestionnaire_splash.lister_objet(objet, id)

@@ -39,15 +39,15 @@ class Trou_de_vers():
 
 
 class Joueur():
-    def __init__(self, parent, nom, etoilemere, couleur):
+    def __init__(self, parent, nom, planete_mere, couleur):
         self.id = get_prochain_id()
         self.parent = parent
         self.nom = nom
-        self.etoilemere = etoilemere
-        self.etoilemere.proprietaire = self.nom
+        self.planete_mere = planete_mere
+        self.planete_mere.proprietaire = self.nom
         self.couleur = couleur
         self.log = []
-        self.etoilescontrolees = [etoilemere]
+        self.planetes_controlees = [planete_mere]
         self.flotte = {"Eclaireur": {},
                        "Cargo": {},
                        "Combat": {}}
@@ -56,7 +56,7 @@ class Joueur():
 
     def creervaisseau(self, type_vaisseau): #TODO update hangar
         type_vaisseau =  type_vaisseau[0]
-        x, y = self.etoilemere.position
+        x, y = self.planete_mere.position
         position = Point(x + 10, y)
         if type_vaisseau == "Cargo":
             v = Cargo(self.nom, position)
@@ -80,8 +80,8 @@ class Joueur():
                 ori = self.flotte[i][idori]
 
         if ori:
-            if type_cible == "Etoile":
-                for j in self.parent.etoiles:
+            if type_cible == "Planete":
+                for j in self.parent.planetes:
                     if j.id == iddesti:
                         ori.acquerir_cible(j, type_cible)
                         return
@@ -105,20 +105,20 @@ class Joueur():
                 j = self.flotte[i][j]
                 rep = j.jouer_prochain_coup(chercher_nouveau)
                 if rep:
-                    if rep[0] == "Etoile":
-                        # NOTE  est-ce qu'on doit retirer l'etoile de la liste du modele
-                        #       quand on l'attribue aux etoilescontrolees
-                        #       et que ce passe-t-il si l'etoile a un proprietaire ???
-                        self.etoilescontrolees.append(rep[1])
-                        self.parent.parent.afficher_etoile(self.nom, rep[1])
+                    if rep[0] == "Planete":
+                        # NOTE  est-ce qu'on doit retirer la planete de la liste du modele
+                        #       quand on l'attribue aux planete_controlees
+                        #       et que ce passe-t-il si la planete a un proprietaire ???
+                        self.planetes_controlees.append(rep[1])
+                        self.parent.parent.afficher_planete(self.nom, rep[1])
                     elif rep[0] == "Porte_de_ver":
                         pass
 
 
 # IA- nouvelle classe de joueur
 class IA(Joueur):
-    def __init__(self, parent, nom, etoilemere, couleur):
-        Joueur.__init__(self, parent, nom, etoilemere, couleur)
+    def __init__(self, parent, nom, planete_mere, couleur):
+        Joueur.__init__(self, parent, nom, planete_mere, couleur)
         self.cooldownmax = 1000
         self.cooldown = 20
 
@@ -129,13 +129,13 @@ class IA(Joueur):
         #         j=self.flotte[i][j]
         #         rep=j.jouer_prochain_coup(1)
         #         if rep:
-        #             self.etoilescontrolees.append(rep[1])
+        #             self.planetes_controlees.append(rep[1])
         self.avancer_flotte(1)
 
         if self.cooldown == 0:
             v = self.creervaisseau(["Eclaireur"])
-            cible = random.choice(self.parent.etoiles)
-            v.acquerir_cible(cible, "Etoile")
+            cible = random.choice(self.parent.planetes)
+            v.acquerir_cible(cible, "Planete")
             self.cooldown = random.randrange(self.cooldownmax) + self.cooldownmax
         else:
             self.cooldown -= 1
@@ -146,13 +146,13 @@ class Modele():
         self.parent = parent
         self.largeur = 9000
         self.hauteur = 9000
-        self.nb_etoiles = int((self.hauteur * self.largeur) / 500000)
+        self.nb_planetes = int((self.hauteur * self.largeur) / 500000)
         self.joueurs = {}
         self.actions_a_faire = {}
-        self.etoiles = []
+        self.planetes = []
         self.trou_de_vers = []
         self.cadre_courant = None
-        self.creeretoiles(joueurs, 1)
+        self.creer_planetes(joueurs, 1)
         nb_trou = int((self.hauteur * self.largeur) / 5000000)
         self.creer_troudevers(nb_trou)
 
@@ -165,40 +165,40 @@ class Modele():
             y2 = random.randrange(self.hauteur - (2 * bordure)) + bordure
             self.trou_de_vers.append(Trou_de_vers(x1, y1, x2, y2))
 
-    def creeretoiles(self, joueurs, ias=0):
+    def creer_planetes(self, joueurs, ias=0):
         bordure = 10
-        for i in range(self.nb_etoiles):
+        for i in range(self.nb_planetes):
             x = random.randrange(self.largeur - (2 * bordure)) + bordure
             y = random.randrange(self.hauteur - (2 * bordure)) + bordure
-            self.etoiles.append(Planete(Point(x, y)))
+            self.planetes.append(Planete(Point(x, y)))
         np = len(joueurs) + ias
-        etoile_occupee = []
+        planete_occupee = []
         while np:
-            p = random.choice(self.etoiles)
-            if p not in etoile_occupee:
-                etoile_occupee.append(p)
-                self.etoiles.remove(p)
+            p = random.choice(self.planetes)
+            if p not in planete_occupee:
+                planete_occupee.append(p)
+                self.planetes.remove(p)
                 np -= 1
 
         couleurs = ["red", "blue", "lightgreen", "yellow",
                     "lightblue", "pink", "gold", "purple"]
         for i in joueurs:
-            etoile = etoile_occupee.pop(0)
-            self.joueurs[i] = Joueur(self, i, etoile, couleurs.pop(0))
-            x, y = etoile.position
+            planete = planete_occupee.pop(0)
+            self.joueurs[i] = Joueur(self, i, planete, couleurs.pop(0))
+            x, y = planete.position
             usine: Usine = Usine()
-            etoile.ajouter_batiment(usine)
+            planete.ajouter_batiment(usine)
             dist = 500
             for e in range(5):
                 x1 = random.randrange(x - dist, x + dist)
                 y1 = random.randrange(y - dist, y + dist)
-                self.etoiles.append(Planete(Point(x1, y1)))
+                self.planetes.append(Planete(Point(x1, y1)))
 
         # IA- creation des ias
         couleursia = ["orange", "green", "cyan",
                       "SeaGreen1", "turquoise1", "firebrick1"]
         for i in range(ias):
-            self.joueurs["IA_" + str(i)] = IA(self, "IA_" + str(i), etoile_occupee.pop(0), couleursia.pop(0))
+            self.joueurs["IA_" + str(i)] = IA(self, "IA_" + str(i), planete_occupee.pop(0), couleursia.pop(0))
         print(self.joueurs)
 
     ##############################################################################
@@ -220,7 +220,7 @@ class Modele():
         # aux joueurs en premier
         for joueur in self.joueurs:
             self.joueurs[joueur].jouer_prochain_coup()
-            for planete in self.joueurs[joueur].etoilescontrolees:
+            for planete in self.joueurs[joueur].planetes_controlees:
                 planete.produire_ressources()
 
         # NOTE si le modele (qui représent.keyse l'univers !!! )
