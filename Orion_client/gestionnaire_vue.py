@@ -5,8 +5,8 @@ avec le serveur.
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable
+from enum import Enum
 from modeles.vaisseau import Vaisseau
-
 from modeles.planete import Planete
 
 
@@ -14,10 +14,16 @@ if TYPE_CHECKING:
     from controleur_serveur import Controleur
     from tkinter import Canvas
 
+
+
 import tkinter as tk
 
 from vue import Vue, VueSplash, VueLobby,VueCosmos,VueHUD
-from orion_modele import Modele
+from orion_modele import Modele, Point
+
+class EtatClic(Enum):
+    DEFAULT = 0 
+    BOUGER_VAISSEAU = 1
 
 class GestionnaireVue(ABC):
     """Classe de base pour tous les gestionnaires de vues."""
@@ -177,6 +183,8 @@ class GestionnairePartie(GestionnaireVue):
 
         self.ma_selection = None
 
+        self.etatClic =  EtatClic.DEFAULT
+
         self.vueCosmos = VueCosmos(self.root, self.game_frame,self.controleur.modele)
         self.vueHUD = VueHUD(self.root, self.game_frame,self.controleur.modele)
         
@@ -193,7 +201,16 @@ class GestionnairePartie(GestionnaireVue):
         self.vueHUD.bouton_combat.bind("<Button-1>", self.creer_vaisseau)
         self.vueHUD.bouton_cargo.bind("<Button-1>", self.creer_vaisseau)
         self.vueHUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
+        self.vueHUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
         #self.vueHUD.bouton_batiment.bind("<Button-1>", self.construire_batiment)
+
+    def bouger_vaisseau(self,e):
+        self.etatClic = EtatClic.BOUGER_VAISSEAU
+        v_select = self.controleur.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
+        self.depart_x = v_select.position.x
+        self.depart_y = v_select.position.y
+
+        
 
     def creer_vaisseau(self, evt):
         type_vaisseau = evt.widget.cget("text")
@@ -201,38 +218,53 @@ class GestionnairePartie(GestionnaireVue):
         self.vueCosmos.afficher_vaisseau()
 
     def cosmos_clic(self,e):
-        before_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
-        before_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
-        self.vueCosmos.centrer_clic(e)
-        after_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
-        after_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
-
-        move_x = after_x - before_x
-        move_y = after_y - before_y
-
-        self.vueHUD.reposition_cursor(move_x,move_y)
         
-        #self.vueHUD.reposition_cursor()
-        t = self.vueCosmos.canvas_cosmos.gettags(tk.CURRENT)
-        if t:  # il y a des tags
-            if t[0] == self.controleur.mon_nom:  # et
-                self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
-                if t[2] == "Etoile":
-                    self.afficher_menu_planete(self.ma_selection)
-                    #self.montrer_etoile_selection()
-                elif t[3] == "Vaisseau":
-                    self.afficher_menu_vaisseau(self.ma_selection)
-                    #self.montrer_flotte_selection()
-            elif ("Etoile" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
-                if self.ma_selection:
-                    #self.parent.cibler_flotte(self.ma_selection[1], t[1], t[2])
-                    pass
+        if(self.etatClic == EtatClic.BOUGER_VAISSEAU):
+            v_select = self.controleur.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
+
+            destination_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
+            destination_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
+
+            v_select.cible = Point(destination_x,destination_y)
+
+            self.etatClic = EtatClic.DEFAULT
+
+
+        elif(self.etatClic == EtatClic.DEFAULT): 
+            self.centre_ecran_canvas_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
+            self.centre_ecran_canvas_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
+
+            self.vueCosmos.centrer_canvas(self.centre_ecran_canvas_x ,self.centre_ecran_canvas_y )
+
+            after_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
+            after_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
+
+            move_x = after_x - self.centre_ecran_canvas_x 
+            move_y = after_y - self.centre_ecran_canvas_y 
+
+            self.vueHUD.reposition_cursor(move_x,move_y)
+            
+            #self.vueHUD.reposition_cursor()
+            t = self.vueCosmos.canvas_cosmos.gettags(tk.CURRENT)
+            if t:  # il y a des tags
+                if t[0] == self.controleur.mon_nom:  # et
+                    self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
+                    if t[2] == "Etoile":
+                        self.afficher_menu_planete(self.ma_selection)
+                        #self.montrer_etoile_selection()
+                    elif t[3] == "Vaisseau":
+                        self.afficher_menu_vaisseau(self.ma_selection)
+                        #self.montrer_flotte_selection()
+                elif ("Etoile" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
+                    if self.ma_selection:
+                        #self.parent.cibler_flotte(self.ma_selection[1], t[1], t[2])
+                        pass
+                    self.ma_selection = None
+                    self.vueCosmos.canvas_cosmos.delete("marqueur")
+            else:  # aucun tag => rien sous la souris - sinon au minimum il y aurait CURRENT
+                print("Region inconnue")
                 self.ma_selection = None
                 self.vueCosmos.canvas_cosmos.delete("marqueur")
-        else:  # aucun tag => rien sous la souris - sinon au minimum il y aurait CURRENT
-            print("Region inconnue")
-            self.ma_selection = None
-            self.vueCosmos.canvas_cosmos.delete("marqueur")
 
     def afficher_menu_planete(self, info_click: list):
         for joueur in self.controleur.modele.joueurs.keys():
