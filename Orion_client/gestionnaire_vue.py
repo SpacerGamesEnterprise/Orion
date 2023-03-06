@@ -37,6 +37,12 @@ class EtatClic(Enum):
     DEFAULT = 0 
     BOUGER_VAISSEAU = 1
 
+class EtatMenu(Enum):
+    DEFAULT = 0
+    MENU_PLANETE = 1
+    MENU_VAISSEAU = 2
+    MENU_BATIMENT = 3
+
 class GestionnaireVue(ABC):
     """Classe de base pour tous les gestionnaires de vues."""
     def __init__(self, parent: GestionnaireVue, controleur: Controleur):
@@ -197,6 +203,7 @@ class GestionnairePartie(GestionnaireVue):
         self.ma_selection = None
 
         self.etat_clic =  EtatClic.DEFAULT
+        self.etat_menu = EtatClic.DEFAULT
 
         self.vue_cosmos = VueCosmos(self.root, self.game_frame, self.modele)
         self.vue_HUD = VueHUD(self.root, self.game_frame, self.modele)
@@ -306,15 +313,22 @@ class GestionnairePartie(GestionnaireVue):
 
             self.vue_HUD.reposition_cursor(move_x,move_y)
             
+            if self.etat_menu == EtatMenu.MENU_VAISSEAU:
+                self.vue_HUD.cacher_menu_vaisseau()
+                self.etat_menu = EtatMenu.DEFAULT
             #self.vueHUD.reposition_cursor()
+
             t = self.vue_cosmos.canvas_cosmos.gettags(tk.CURRENT)
+
             if t:  # il y a des tags
                 if t[0] == self.controleur.mon_nom:  # et
                     self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
                     if t[2] == "Planete":
+                        self.etat_menu = EtatMenu.MENU_PLANETE
                         self.afficher_menu_planete(self.ma_selection)
                         #self.montrer_etoile_selection()
                     elif t[3] == "Vaisseau":
+                        self.etat_menu = EtatMenu.MENU_VAISSEAU
                         self.afficher_menu_vaisseau(self.ma_selection)
                         #self.montrer_flotte_selection()
                 elif ("Planete" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
