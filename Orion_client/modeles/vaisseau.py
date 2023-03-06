@@ -1,9 +1,13 @@
 from abc import ABC
+from typing import cast
+
 import random
-from id import get_prochain_id
+
+from modeles.position import Point, Vecteur
 from modeles.ressources import Ressources
+
+from id import get_prochain_id
 from helper import Helper as hlp
-from modeles.position import Point
 
 class Vaisseau(ABC):  
     """Classe parente des types de vaisseau"""
@@ -21,27 +25,30 @@ class Vaisseau(ABC):
         self.niveau: int = 1
         self.cout_construction: Ressources = Ressources()
 
-        self.cible = 0
+        self.cible: Point = None
         self.type_cible = None
-        self.angle_cible = 0
+        #self.angle_cible = 0
+        self.mouvement = Vecteur(0, 0)
+        """Vecteur de la position actuelle vers la cible"""
         #self.arriver = {"Etoile": self.arriver_etoile,
                         #"Porte_de_vers": self.arriver_porte}
                         
                         
     def ameliorer(self, inventaire_planete: Ressources) -> Ressources:
-        """Retourne l'inventaire de la planete et augmente le niveau du vaissseau"""
-        if inventaire_planete.has_more(self.cout_construction + self.cout_construction):
-            self.cout_construction += self.cout_construction        
+        """Retourne l'inventaire de la planète et augmente
+        le niveau du vaissseau
+        """
+        if inventaire_planete.has_more(2 * self.cout_construction):
+            self.cout_construction *= 2        
             inventaire_planete -= self.cout_construction
             self.niveau += 1
         return inventaire_planete      
-    
-                            
 
     def jouer_prochain_coup(self, trouver_nouveau=0):
         if self.cible != 0:
             return self.avancer()
         elif trouver_nouveau:
+            # NOTE: Accéder au parent est très mal
             cible = random.choice(self.parent.parent.etoiles)
             self.acquerir_cible(cible, "Etoile")
 
@@ -51,16 +58,18 @@ class Vaisseau(ABC):
         self.angle_cible = hlp.calcAngle(self.position.x, self.position.y, self.cible.x, self.cible.y)
 
     def avancer(self):
-        if self.cible != 0:
-            x = self.cible.x
-            y = self.cible.y
-            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.position.x, self.position.y)
-            if hlp.calcDistance(self.x, self.y, x, y) <= self.vitesse:
-                type_obj = type(self.cible).__name__
-                rep = self.arriver[type_obj]()
+        """Avance le vaisseau vers sa cible selon sa vitesse."""
+        if self.cible is not None:
+            destination = cast(Point, self.cible.position)  # Type hinting
+            mouvement = destination - self.position
+            mouvement = mouvement.clamp(self.vitesse)
+            self.position += mouvement
+            if mouvement.norm <= self.vitesse:
+                rep = self.arriver[self.type_cible]()
                 return rep
 
     def arriver_etoile(self):
+        # NOTE: Accéder au parent est très mal
         self.parent.log.append(
             ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
         if not self.cible.proprietaire:
@@ -70,6 +79,7 @@ class Vaisseau(ABC):
         return ["Etoile", cible]
 
     def arriver_porte(self):
+        # NOTE: Accéder au parent est très mal
         self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
         cible = self.cible
         trou = cible.parent
