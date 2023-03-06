@@ -259,10 +259,7 @@ class VueHUD(Vue):
             width=self.minimap_size, height=self.minimap_size,                      
             bg="#000000",highlightbackground ="#a48dc2"
         )
-        self.minimap_background = self.minimap.create_image(
-            self.minimap_size/2,self.minimap_size/2,
-            image = self.minimap_background_img,
-        )
+        self.afficher_mini_background()
         self.minimap_cursor = self.minimap.create_rectangle(
             0,0,
             self.cursor_width,self.cursor_height,
@@ -539,8 +536,17 @@ class VueHUD(Vue):
             50, 20,
             text=nom, font=('Helvetica 10'),fill="white"
         )
+    
+    def afficher_mini_background(self):
+        self.minimap_background = self.minimap.create_image(
+            self.minimap_size/2,self.minimap_size/2,
+            image = self.minimap_background_img,
+        )
 
     def afficher_mini_cosmos(self):  # univers(self, mod):
+        self.minimap.delete(tk.ALL)
+        self.reposition_cursor(0,0) #reaffiche le curseur
+        self.afficher_mini_background()
         for j in self.modele.planetes:
             minix = j.position.x / self.modele.largeur * self.minimap_size
             miniy = j.position.y / self.modele.hauteur * self.minimap_size
