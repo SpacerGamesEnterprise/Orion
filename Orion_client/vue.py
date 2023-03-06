@@ -527,6 +527,14 @@ class VueCosmos(Vue):
             "Orion_client/graphics/gameBackground.png",
             (self.max_map_size,self.max_map_size)
         )
+        self.cargo_image = img_resize(
+            "Orion_client/graphics/image_vaisseau/Cargo.png",
+            (self.planet_diameter,self.planet_diameter)
+        )
+        self.vaisseau_image = img_resize(
+            "Orion_client/graphics/image_vaisseau/Combat.png",
+            (self.planet_diameter,self.planet_diameter)
+        )
         
     
     def do_zoom(self,e):
@@ -615,8 +623,29 @@ class VueCosmos(Vue):
                         tags=(j.proprietaire, str(j.id), "Etoile")
                     )
 
-                
-                
+    def afficher_vaisseau(self):
+        for i in self.modele.joueurs.keys():
+            i = self.modele.joueurs[i]
+            for k in i.flotte:
+                for j in i.flotte[k]:
+                    j = i.flotte[k][j]
+                    tailleF = j.taille * 2
+                    if k == "Combat":
+                        self.canvas_cosmos.create_image((j.position.x - tailleF), (j.position.y - tailleF),
+                            image= self.vaisseau_image,
+                            tags=(j.proprietaire, str(j.id), "Flotte", k, "Vaisseau")
+                        )
+                    if k == "Cargo":
+                        self.canvas_cosmos.create_image((j.position.x - tailleF), (j.position.y - tailleF),
+                            image= self.cargo_image,
+                            tags=(j.proprietaire, str(j.id), "Flotte", k, "Vaisseau")
+                        )
+                    if k == "Eclaireur":
+                        self.canvas_cosmos.create_image((j.position.x - tailleF), (j.position.y - tailleF),
+                            image= self.vaisseau_image,
+                            tags=(j.proprietaire, str(j.id), "Flotte", k, "Vaisseau")
+                        )   
+                    
                 
                 
                 # on affiche dans minimap

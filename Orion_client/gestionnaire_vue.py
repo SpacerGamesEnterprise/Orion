@@ -192,10 +192,12 @@ class GestionnairePartie(GestionnaireVue):
         self.vueHUD.bouton_combat.bind("<Button-1>", self.creer_vaisseau)
         self.vueHUD.bouton_cargo.bind("<Button-1>", self.creer_vaisseau)
         self.vueHUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
+        #self.vueHUD.bouton_batiment.bind("<Button-1>", self.construire_batiment)
 
     def creer_vaisseau(self, evt):
         type_vaisseau = evt.widget.cget("text")
         self.controleur.creer_vaisseau(type_vaisseau)
+        self.vueCosmos.afficher_vaisseau()
 
     def cosmos_clic(self,e):
         before_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
