@@ -39,7 +39,7 @@ class Planete():
                 and self.inventaire_ressources.has_more(batiment.cout_construction):
             self.inventaire_ressources -= batiment.cout_construction
             self.batiments.append(batiment)
-            return True  
+            return True
         return False
     
     def produire_ressources(self):

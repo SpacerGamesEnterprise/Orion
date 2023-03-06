@@ -4,10 +4,20 @@ avec le serveur.
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from turtle import update
 from typing import TYPE_CHECKING, Callable
 from enum import Enum
-from Orion_client.modeles.batiment import Centrale, Defense, Eglise, Ferme, Hangar, Laboratoire, Mine, Scierie
+
+from modeles.batiment import (
+    Batiment,
+    Centrale,
+    Defense,
+    Eglise,
+    Ferme,
+    Hangar,
+    Laboratoire,
+    Mine,
+    Scierie
+)
 from modeles.vaisseau import Vaisseau
 from modeles.planete import Planete
 
@@ -196,13 +206,7 @@ class GestionnairePartie(GestionnaireVue):
     def update_jeu(self):
         if self.ma_selection is not None:
             if self.ma_selection[2] == "Planete":
-                joueur = self.modele.joueurs[self.ma_selection[0]]
-                planete_select = [
-                    planete
-                    for planete in joueur.planetes_controlees
-                    if planete.id == self.ma_selection[1]
-                ][0]
-                self.vue_HUD.update_info_planete(planete_select)
+                self.vue_HUD.update_info_planete(self.planete_select)
         """Mise à jour de la vue du jeu."""
         for joueur in self.modele.joueurs.values():
             for vaisseaumap in joueur.flotte.values():
@@ -223,15 +227,39 @@ class GestionnairePartie(GestionnaireVue):
         self.vue_HUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
         self.vue_HUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
         self.vue_HUD.bouton_conquerir.bind("<Button-1>",self.conquerir)
-        self.vue_HUD.bouton_batiment.bind("<Button-1>", self.vue_HUD.afficher_menu_batiments)
-        self.vue_HUD.bouton_defense.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Defense()))
-        self.vue_HUD.bouton_ferme.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Ferme()))
-        self.vue_HUD.bouton_centrale.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Centrale()))
-        self.vue_HUD.bouton_mine.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Mine()))
-        self.vue_HUD.bouton_hangar.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Hangar()))
-        self.vue_HUD.bouton_laboratoire.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Laboratoire()))
-        self.vue_HUD.bouton_scierie.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Scierie()))
-        self.vue_HUD.bouton_eglise.bind("<Button-1>", self.modele.planetes[self.ma_selection].ajouter_batiment(Eglise()))
+        self.vue_HUD.bouton_batiment.bind("<Button-1>", self.afficher_menu_batiment)
+        self.vue_HUD.bouton_defense.bind("<Button-1>", self.bind_batiment(Defense))
+        self.vue_HUD.bouton_ferme.bind("<Button-1>", self.bind_batiment(Ferme))
+        self.vue_HUD.bouton_centrale.bind("<Button-1>", self.bind_batiment(Centrale))
+        self.vue_HUD.bouton_mine.bind("<Button-1>", self.bind_batiment(Mine))
+        self.vue_HUD.bouton_hangar.bind("<Button-1>", self.bind_batiment(Hangar))
+        self.vue_HUD.bouton_laboratoire.bind("<Button-1>", self.bind_batiment(Laboratoire))
+        self.vue_HUD.bouton_scierie.bind("<Button-1>", self.bind_batiment(Scierie))
+        self.vue_HUD.bouton_eglise.bind("<Button-1>", self.bind_batiment(Eglise))
+
+    @property
+    def planete_select(self) -> Planete | None:
+        """Retourne la planète actuellement sélectionnée, si possible."""
+        if (self.ma_selection is not None 
+                and self.ma_selection[2] == "Planete"
+        ):
+            joueur = self.modele.joueurs[self.ma_selection[0]]
+            return [
+                planete
+                for planete in joueur.planetes_controlees
+                if planete.id == self.ma_selection[1]
+            ][0]
+        else:
+            return None
+
+    def bind_batiment(self, type_batiment: type[Batiment]):
+        def inner(*args, **kwargs):
+            self.planete_select.ajouter_batiment(type_batiment())
+        return inner
+
+    def afficher_menu_batiment(self, e):
+        self.vue_HUD.afficher_menu_batiments(self.planete_select)
+
     def bouger_vaisseau(self,e):
         self.etat_clic = EtatClic.BOUGER_VAISSEAU
         v_select = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
@@ -301,13 +329,7 @@ class GestionnairePartie(GestionnaireVue):
                 self.vue_cosmos.canvas_cosmos.delete("marqueur")
 
     def afficher_menu_planete(self, info_click: list):
-        joueur = self.modele.joueurs[self.ma_selection[0]]
-        planete_select = [
-            planete
-            for planete in joueur.planetes_controlees
-            if planete.id == self.ma_selection[1]
-        ][0]
-        self.vue_HUD.afficher_menu_planete(planete_select)
+        self.vue_HUD.afficher_menu_planete(self.planete_select)
     
     def afficher_menu_vaisseau(self, info_click: list):
         self.vue_HUD.afficher_menu_vaisseau(self.modele.joueurs[info_click[0]].flotte[info_click[2]][info_click[1]])

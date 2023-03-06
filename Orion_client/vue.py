@@ -388,6 +388,8 @@ class VueHUD(Vue):
 
 
     def update_info_planete(self, planete: Planete):
+        if not isinstance(planete, Planete):
+            raise TypeError(f"Mauvais type envoye: {type(planete) = } ({planete = })")
         string_batiments: str = ""
 
         for batiment in planete.batiments:
