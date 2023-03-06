@@ -607,12 +607,14 @@ class VueCosmos(Vue):
         self.planete_size_randomizer =random.randint(0,20)
 
         self.map_size = 9000#taille du canvas du cosmos
-        self.max_map_size = 2100
+        self.background_image_size = 2100
+        self.background_stars_image_size =4200
         self.min_map_size = 1500
         
         #variables pour effet de profondeur
         self.background_x = self.background_width/2
         self.background_y = self.background_height/2
+
         self.zoom = 3
 
         self.load_images()
@@ -624,8 +626,12 @@ class VueCosmos(Vue):
         )
         
         self.background = self.canvas_cosmos.create_image(
-            self.max_map_size/2,self.max_map_size/2,
+            self.background_image_size/2,self.background_image_size/2,
             image = self.background_image
+        )
+        self.background_stars = self.canvas_cosmos.create_image(
+            self.background_stars_image_size/2,self.background_stars_image_size/2,
+            image = self.background_stars_image
         )
         
         self.scrollX = tk.Scrollbar(self.main_frame, orient=tk.HORIZONTAL)
@@ -654,7 +660,11 @@ class VueCosmos(Vue):
        
         self.background_image = img_resize(
             getimg("gameBackground.png"),
-            (self.max_map_size,self.max_map_size)
+            (self.background_image_size,self.background_image_size)
+        )
+        self.background_stars_image = img_resize(
+            getimg("starsGameBackground.png"),
+            (self.background_stars_image_size,self.background_stars_image_size)
         )
         self.cargo_image = img_resize(
             getimg("image_vaisseau", "Cargo.png"),
@@ -698,7 +708,7 @@ class VueCosmos(Vue):
         factor = 1.001 ** e.delta
         self.map_size = self.map_size * factor
         zoom_valide=False
-        if(self.map_size>self.max_map_size):self.map_size=self.max_map_size
+        if(self.map_size>self.background_image_size):self.map_size=self.background_image_size
         elif(self.map_size<self.min_map_size):self.map_size=self.min_map_size
         else: zoom_valide = True
             
@@ -721,11 +731,23 @@ class VueCosmos(Vue):
         move_x = x - self.background_x
         move_y = y - self.background_y
           
-        move_background_x = (move_x /(self.map_size-self.background_width))*(self.map_size - self.max_map_size)
-        move_background_y = (move_y /(self.map_size-self.background_height))*(self.map_size - self.max_map_size)
-        
-        self.canvas_cosmos.move(self.background, move_background_x , move_background_y)
-        self.background_x = x
+        move_background_x = (move_x /(self.map_size-self.background_width))*(self.map_size - self.background_image_size)
+        move_background_y = (move_y /(self.map_size-self.background_height))*(self.map_size - self.background_image_size)
+
+        move_background_stars_x = (move_x /(self.map_size-self.background_width))*(self.map_size - self.background_stars_image_size)
+        move_background_stars_y = (move_y /(self.map_size-self.background_height))*(self.map_size - self.background_stars_image_size)
+
+        self.canvas_cosmos.move(
+            self.background,
+            move_background_x , move_background_y
+        )
+
+        self.canvas_cosmos.move(
+            self.background_stars,
+            move_background_stars_x,move_background_stars_y
+        )
+
+        self.background_x = x 
         self.background_y = y
     
     def centrer_canvas(self,x,y):
