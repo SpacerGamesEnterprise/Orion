@@ -281,6 +281,7 @@ class GestionnairePartie(GestionnaireVue):
                         self.modele.planetes.remove(planete)
                         self.modele.joueurs[self.ma_selection[0]].planetes_controlees.append(planete)
                         self.vue_cosmos.coloniser(planete)
+        
 
 
     def creer_vaisseau(self, evt):

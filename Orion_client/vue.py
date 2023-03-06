@@ -784,6 +784,7 @@ class VueCosmos(Vue):
                         image= self.planete_rouge_image[size_randomizer],
                         tags=(planete.proprietaire, str(planete.id), "Planete")
                     )
+        self.afficher_vaisseau()#TODO changer a afficher 1 vaisseau spécifique pour mettre le vaisseau au dessus de l'image de planète
 
     def afficher_vaisseau(self):
         for i in self.modele.joueurs.keys():
