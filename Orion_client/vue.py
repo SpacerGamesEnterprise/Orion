@@ -769,7 +769,29 @@ class VueCosmos(Vue):
         self.canvas_cosmos.yview_moveto(pcty)
 
     def update_vaisseau(self, vaisseau: Vaisseau):
-        self.canvas_cosmos.moveto(vaisseau.id, *vaisseau.position)
+        self.canvas_cosmos.moveto(
+            vaisseau.id,
+            vaisseau.position.x,vaisseau.position.y
+        )
+
+    def refresh_vaisseau(self,vaisseau: Vaisseau):
+        tailleF = vaisseau.taille * 2
+        self.canvas_cosmos.delete(str(vaisseau.id))
+        if isinstance(vaisseau,Combat):
+            self.canvas_cosmos.create_image((vaisseau.position.x - tailleF), (vaisseau.position.y - tailleF),
+                image= self.vaisseau_image,
+                tags=(vaisseau.proprietaire, str(vaisseau.id), "Combat", "Vaisseau")
+            )
+        if isinstance(vaisseau,Cargo):
+            self.canvas_cosmos.create_image((vaisseau.position.x - tailleF), (vaisseau.position.y - tailleF),
+                image= self.cargo_image,
+                tags=(vaisseau.proprietaire, str(vaisseau.id), "Cargo", "Vaisseau")
+            )
+        if isinstance(vaisseau,Eclaireur):
+            self.canvas_cosmos.create_image((j.position.x - tailleF), (vaisseau.position.y - tailleF),
+                image= self.vaisseau_image,
+                tags=(vaisseau.proprietaire, str(j.id), "Eclaireur", "Vaisseau")
+            )  
 
     def afficher_decor(self): # TODO: faire un truc plus propre
     
@@ -806,13 +828,13 @@ class VueCosmos(Vue):
                         tags=(j.proprietaire, str(j.id), "Planete")
                     )
 
-    def coloniser(self, planete):
+    def coloniser(self, planete,vaisseau):
         size_randomizer =random.randint(0,self.n_planet_variation)
         self.canvas_cosmos.create_image(*planete.position,
                         image= self.planete_rouge_image[size_randomizer],
                         tags=(planete.proprietaire, str(planete.id), "Planete")
                     )
-        self.afficher_vaisseau()#TODO changer a afficher 1 vaisseau spécifique pour mettre le vaisseau au dessus de l'image de planète
+        self.refresh_vaisseau(vaisseau)
 
     def afficher_vaisseau(self):
         for i in self.modele.joueurs.keys():

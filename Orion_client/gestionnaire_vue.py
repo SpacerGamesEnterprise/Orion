@@ -272,6 +272,8 @@ class GestionnairePartie(GestionnaireVue):
         v_select = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
 
     def conquerir(self, e): # TODO: use tags
+        vaisseau_colonisateur = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
+        
         for planete in self.modele.planetes:
             pos_vaisseau = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]].position
             if pos_vaisseau.y - 100 < planete.position.y < pos_vaisseau.y + 100:
@@ -280,8 +282,10 @@ class GestionnairePartie(GestionnaireVue):
                         planete.proprietaire = self.modele.joueurs[self.ma_selection[0]].nom
                         self.modele.planetes.remove(planete)
                         self.modele.joueurs[self.ma_selection[0]].planetes_controlees.append(planete)
-                        self.vue_cosmos.coloniser(planete)
+                        self.vue_cosmos.coloniser(planete,vaisseau_colonisateur)
         self.vue_HUD.afficher_mini_cosmos()
+
+
         
 
 
