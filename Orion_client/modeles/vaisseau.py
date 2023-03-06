@@ -13,6 +13,7 @@ class Vaisseau(ABC):
         self.id: int = get_prochain_id()
         self.proprietaire: str = nom
         self.position: Point = position
+        self.cargo: Ressources = Ressources()
         self.espace_cargo: Ressources = Ressources()
         self.taille: int = 5
         self.vitesse: int = 2
@@ -47,39 +48,39 @@ class Vaisseau(ABC):
     def acquerir_cible(self, cible, type_cible):
         self.type_cible = type_cible
         self.cible = cible
-        self.angle_cible = hlp.calcAngle(self.x, self.y, self.cible.x, self.cible.y)
+        self.angle_cible = hlp.calcAngle(self.position.x, self.position.y, self.cible.x, self.cible.y)
 
     def avancer(self):
         if self.cible != 0:
             x = self.cible.x
             y = self.cible.y
-            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.x, self.y)
+            self.x, self.y = hlp.getAngledPoint(self.angle_cible, self.vitesse, self.position.x, self.position.y)
             if hlp.calcDistance(self.x, self.y, x, y) <= self.vitesse:
                 type_obj = type(self.cible).__name__
                 rep = self.arriver[type_obj]()
                 return rep
 
-    # def arriver_etoile(self):
-    #     self.parent.log.append(
-    #         ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
-    #     if not self.cible.proprietaire:
-    #         self.cible.proprietaire = self.proprietaire
-    #     cible = self.cible
-    #     self.cible = 0
-    #     return ["Etoile", cible]
+    def arriver_etoile(self):
+        self.parent.log.append(
+            ["Arrive:", self.parent.parent.cadre_courant, "Etoile", self.id, self.cible.id, self.cible.proprietaire])
+        if not self.cible.proprietaire:
+            self.cible.proprietaire = self.proprietaire
+        cible = self.cible
+        self.cible = 0
+        return ["Etoile", cible]
 
-    # def arriver_porte(self):
-    #     self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
-    #     cible = self.cible
-    #     trou = cible.parent
-    #     if cible == trou.porte_a:
-    #         self.x = trou.porte_b.x + random.randrange(6) + 2
-    #         self.y = trou.porte_b.y
-    #     elif cible == trou.porte_b:
-    #         self.x = trou.porte_a.x - random.randrange(6) + 2
-    #         self.y = trou.porte_a.y
-    #     self.cible = 0
-    #     return ["Porte_de_ver", cible]
+    def arriver_porte(self):
+        self.parent.log.append(["Arrive:", self.parent.parent.cadre_courant, "Porte", self.id, self.cible.id, ])
+        cible = self.cible
+        trou = cible.parent
+        if cible == trou.porte_a:
+            self.x = trou.porte_b.x + random.randrange(6) + 2
+            self.y = trou.porte_b.y
+        elif cible == trou.porte_b:
+            self.x = trou.porte_a.x - random.randrange(6) + 2
+            self.y = trou.porte_a.y
+        self.cible = 0
+        return ["Porte_de_ver", cible]
 
 
 class Cargo(Vaisseau):

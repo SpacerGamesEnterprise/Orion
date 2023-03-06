@@ -235,7 +235,7 @@ class Controleur():
         if self.onjoue:
             # envoyer les messages au modele et a la vue de faire leur job
             self.modele.jouer_prochain_coup(self.cadrejeu)
-            self.gestionnaire_partie.afficher_jeu()
+            #self.gestionnaire_partie.afficher_jeu()
         else:
             self.cadrejeu -= 1
             self.onjoue = 1
@@ -306,6 +306,7 @@ class Controleur():
     # TODO: Verify signatures
 
     def creer_vaisseau(self, type_vaisseau: str) -> None:
+        #self.modele.joueurs[self.mon_nom].creervaisseau([type_vaisseau])
         self.actionsrequises.append(
             [self.mon_nom, "creervaisseau", [type_vaisseau]]
         )
@@ -330,3 +331,6 @@ class Controleur():
 if __name__ == "__main__":
     c = Controleur()
     print("End Orion_mini")
+
+
+

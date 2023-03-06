@@ -3,6 +3,9 @@
 
 import ast
 import random
+from modeles.position import Point
+from modeles.vaisseau import Cargo, Eclaireur, Combat
+from modeles.batiment import Usine
 from id import get_prochain_id
 from modeles.planete import Planete
 
@@ -117,21 +120,25 @@ class Joueur():
         self.couleur = couleur
         self.log = []
         self.etoilescontrolees = [etoilemere]
-        self.flotte = {"Vaisseau": {},
-                       "Cargo": {}}
-        self.actions = {"ciblerflotte": self.ciblerflotte}
+        self.flotte = {"Eclaireur": {},
+                       "Cargo": {},
+                       "Combat": {}}
+        self.actions = {"ciblerflotte": self.ciblerflotte,
+                        "creervaisseau": self.creervaisseau}
 
-    # def creervaisseau(self, params):  //A voir pour création vaisseau
-    #     type_vaisseau = params[0]
-    #     if type_vaisseau == "Cargo":
-    #         v = Cargo(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
-    #     else:
-    #         v = Vaisseau(self, self.nom, self.etoilemere.x + 10, self.etoilemere.y)
-    #     self.flotte[type_vaisseau][v.id] = v
+    def creervaisseau(self, type_vaisseau): #TODO update hangar
+        type_vaisseau =  type_vaisseau[0]
+        if type_vaisseau == "Cargo":
+            v = Cargo(self.nom, Point(self.etoilemere.x + 10, self.etoilemere.y))
+        elif type_vaisseau == "Eclaireur":
+            v = Eclaireur(self.nom, Point(self.etoilemere.x + 10, self.etoilemere.y))
+        else:
+            v = Combat(self.nom, Point(self.etoilemere.x + 10, self.etoilemere.y))
+        self.flotte[type_vaisseau][v.id] = v
+        #if self.nom == self.parent.parent.mon_nom:
+            #self.parent.parent.lister_objet(type_vaisseau, v.id)
+        return v
 
-    #     if self.nom == self.parent.parent.mon_nom:
-    #         self.parent.parent.lister_objet(type_vaisseau, v.id)
-    #     return v
 
     def ciblerflotte(self, ids):
         idori, iddesti, type_cible = ids
@@ -193,7 +200,7 @@ class IA(Joueur):
         self.avancer_flotte(1)
 
         if self.cooldown == 0:
-            v = self.creervaisseau(["Vaisseau"])
+            v = self.creervaisseau(["Eclaireur"])
             cible = random.choice(self.parent.etoiles)
             v.acquerir_cible(cible, "Etoile")
             self.cooldown = random.randrange(self.cooldownmax) + self.cooldownmax
@@ -247,6 +254,8 @@ class Modele():
             self.joueurs[i] = Joueur(self, i, etoile, couleurs.pop(0))
             x = etoile.x
             y = etoile.y
+            usine: Usine = Usine()
+            etoile.ajouter_batiment(usine)
             dist = 500
             for e in range(5):
                 x1 = random.randrange(x - dist, x + dist)

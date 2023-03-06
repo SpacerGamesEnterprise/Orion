@@ -5,6 +5,9 @@ avec le serveur.
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable
+from modeles.vaisseau import Vaisseau
+
+from modeles.planete import Planete
 
 
 if TYPE_CHECKING:
@@ -186,19 +189,39 @@ class GestionnairePartie(GestionnaireVue):
         self.vueHUD.minimap_button.bind("<Button-1>",self.vueHUD.montrer_mini)
         self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
         self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
-        
+
+        self.vueHUD.bouton_combat.bind("<Button-1>", self.creer_vaisseau)
+        self.vueHUD.bouton_cargo.bind("<Button-1>", self.creer_vaisseau)
+        self.vueHUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
+        #self.vueHUD.bouton_batiment.bind("<Button-1>", self.construire_batiment)
+
+    def creer_vaisseau(self, evt):
+        type_vaisseau = evt.widget.cget("text")
+        self.controleur.creer_vaisseau(type_vaisseau)
+        self.vueCosmos.afficher_vaisseau()
+
     def cosmos_clic(self,e):
-
+        before_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
+        before_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
         self.vueCosmos.centrer_clic(e)
+        after_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
+        after_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
 
+        move_x = after_x - before_x
+        move_y = after_y - before_y
+
+        self.vueHUD.reposition_cursor(move_x,move_y)
+        
+        #self.vueHUD.reposition_cursor()
         t = self.vueCosmos.canvas_cosmos.gettags(tk.CURRENT)
         if t:  # il y a des tags
             if t[0] == self.controleur.mon_nom:  # et
                 self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
-                print(self.ma_selection)
-                #if t[2] == "Etoile":
+                if t[2] == "Etoile":
+                    self.afficher_menu_planete(self.ma_selection)
                     #self.montrer_etoile_selection()
-                #elif t[2] == "Flotte":
+                elif t[3] == "Vaisseau":
+                    self.afficher_menu_vaisseau(self.ma_selection)
                     #self.montrer_flotte_selection()
             elif ("Etoile" in t or "Porte_de_ver" in t) and t[0] != self.controleur.mon_nom:
                 if self.ma_selection:
@@ -210,6 +233,19 @@ class GestionnairePartie(GestionnaireVue):
             print("Region inconnue")
             self.ma_selection = None
             self.vueCosmos.canvas_cosmos.delete("marqueur")
+
+    def afficher_menu_planete(self, info_click: list):
+        for joueur in self.controleur.modele.joueurs.keys():
+            if self.controleur.modele.joueurs[joueur].nom == info_click[0]:
+                for planete in self.controleur.modele.joueurs[joueur].etoilescontrolees:
+                    if planete.id == info_click[1]:
+                        planete_clique: Planete  = planete
+            
+        self.vueHUD.afficher_menu_planete(planete_clique)
+    
+    def afficher_menu_vaisseau(self, info_click: list):
+        self.vueHUD.afficher_menu_vaisseau(self.controleur.modele.joueurs[info_click[0]].flotte[info_click[2]][info_click[1]])
+
 
     def mini_clic(self,e):
         self.vueCosmos.mini_clic(e)
@@ -223,7 +259,7 @@ class GestionnairePartie(GestionnaireVue):
         self.vueHUD.afficher_info_joueur(self.controleur.mon_nom)
         self.vueHUD.afficher_mini_cosmos()
         self.bind_controls()
-        self.game_frame.mainloop()
+        #self.game_frame.mainloop()
 
     
     def quitter(self):
@@ -234,23 +270,4 @@ class GestionnairePartie(GestionnaireVue):
         gestionnaire = cls_gestionaire(self, self.controleur)
         gestionnaire.debuter()
         return gestionnaire
-        
-    def update_splash(self, etat):
-        canvas: Canvas = self.vue.main_canvas
-        msg: int = self.vue.message
-        if "attente" in etat or "courante" in etat:
-            pass
-            #self.btncreerpartie.config(state=DISABLED)
-        if "courante" in etat:
-            canvas.itemconfigure(msg, text="Desole - partie encours !")
-            #self.btninscrirejoueur.config(state=DISABLED)
-        elif "attente" in etat:
-            canvas.itemconfigure(msg, text="Partie en attente de joueurs !")
-            #self.btninscrirejoueur.config(state=NORMAL)
-        elif "dispo" in etat:
-            canvas.itemconfigure(msg, text="Bienvenue ! Serveur disponible")
-            #self.btninscrirejoueur.config(state=DISABLED)
-            #self.btncreerpartie.config(state=NORMAL)
-        else:
-            canvas.itemconfigure(msg, text="ERREUR - un probleme est survenu")
-
+    
