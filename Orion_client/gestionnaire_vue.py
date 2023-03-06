@@ -211,20 +211,23 @@ class GestionnairePartie(GestionnaireVue):
         self.vue_HUD.bouton_cargo.bind("<Button-1>", self.creer_vaisseau)
         self.vue_HUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
         self.vue_HUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
-        self.vue_HUD.bouton_conquerir.bind("<Button-1>",self.conquerir_vaisseau)
+        self.vue_HUD.bouton_conquerir.bind("<Button-1>",self.conquerir)
         self.vue_HUD.bouton_batiment.bind("<Button-1>", self.vue_HUD.afficher_menu_batiments)
 
     def bouger_vaisseau(self,e):
         self.etat_clic = EtatClic.BOUGER_VAISSEAU
         v_select = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
 
-    def conquerir_vaisseau(self, e):
+    def conquerir(self, e):
         for planete in self.modele.etoiles:
             pos_vaisseau = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]].position
             if pos_vaisseau.y - 100 < planete.position.y < pos_vaisseau.y + 100:
                 if pos_vaisseau.x - 100 < planete.position.x < pos_vaisseau.x + 100:
-                    planete.proprietaire = self.modele.joueurs[self.ma_selection[0]].nom
-                    self.vue_cosmos.coloniser(planete)
+                    if planete.proprietaire == "":
+                        planete.proprietaire = self.modele.joueurs[self.ma_selection[0]].nom
+                        self.modele.etoiles.remove(planete)
+                        self.modele.joueurs[self.ma_selection[0]].etoilescontrolees.append(planete)
+                        self.vue_cosmos.coloniser(planete)
 
 
     def creer_vaisseau(self, evt):
