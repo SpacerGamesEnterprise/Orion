@@ -24,7 +24,7 @@ class Vaisseau(ABC):
         self.cargo: Ressources = Ressources()
         self.espace_cargo: Ressources = Ressources()
         self.taille: int = 5
-        self.vitesse: int = 2
+        self.vitesse: int = 20
         self.nom_vaisseau: str = ""
         self.niveau: int = 1
         self.cout_construction: Ressources = Ressources()
@@ -36,8 +36,8 @@ class Vaisseau(ABC):
         """Vecteur de la position actuelle vers la cible"""
         self.arriver = {
             None: log,
-            "Etoile": self.arriver_etoile,
-            "Porte_de_vers": self.arriver_porte,
+            "Etoile": log, #self.arriver_etoile,
+            "Porte_de_vers": log, #self.arriver_porte,
         }
                         
                         
@@ -52,28 +52,27 @@ class Vaisseau(ABC):
         return inventaire_planete      
 
     def jouer_prochain_coup(self, trouver_nouveau=0):
-        if self.cible != 0:
+        if self.cible is not None:
             return self.avancer()
         elif trouver_nouveau:
             # NOTE: Accéder au parent est très mal
-            cible = random.choice(self.parent.parent.etoiles)
-            self.acquerir_cible(cible, "Etoile")
+           # cible = random.choice(self.parent.parent.etoiles)
+            #self.acquerir_cible(cible, "Etoile")
+            pass
 
     def acquerir_cible(self, cible, type_cible):
         self.type_cible = type_cible
-        self.cible = cible
-        self.angle_cible = hlp.calcAngle(self.position.x, self.position.y, self.cible.x, self.cible.y)
+        self.cible = cible.position
 
     def avancer(self):
         """Avance le vaisseau vers sa cible selon sa vitesse."""
         if self.cible is not None:
-            destination = cast(Point, self.cible.position)  # Type hinting
-            mouvement = destination - self.position
-            mouvement = mouvement.clamp(self.vitesse)
+            vec_total = self.cible - self.position
+            mouvement = vec_total.clamp(self.vitesse)
             self.position += mouvement
-            if mouvement.norm <= self.vitesse:
-                rep = self.arriver[self.type_cible]()
-                return rep
+            if vec_total.norm <= self.vitesse:
+                self.cible = None
+                return self.arriver[self.type_cible]()
 
     def arriver_etoile(self):
         # NOTE: Accéder au parent est très mal

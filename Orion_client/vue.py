@@ -454,8 +454,8 @@ class VueHUD(Vue):
 
     def afficher_mini_cosmos(self):  # univers(self, mod):
         for j in self.modele.etoiles:
-            minix = j.x / self.modele.largeur * self.minimap_size
-            miniy = j.y / self.modele.hauteur * self.minimap_size
+            minix = j.position.x / self.modele.largeur * self.minimap_size
+            miniy = j.position.y / self.modele.hauteur * self.minimap_size
             self.minimap.create_rectangle(
                 minix, miniy, minix + 3, miniy + 3,
                 fill="#FFFFFF",
@@ -463,8 +463,8 @@ class VueHUD(Vue):
             )
         for i in self.modele.joueurs.keys():
             for j in self.modele.joueurs[i].etoilescontrolees:
-                minix = j.x / self.modele.largeur * self.minimap_size
-                miniy = j.y / self.modele.hauteur * self.minimap_size
+                minix = j.position.x / self.modele.largeur * self.minimap_size
+                miniy = j.position.y / self.modele.hauteur * self.minimap_size
                 self.minimap.create_rectangle(
                     minix, miniy, minix + 5, miniy + 5,
                     fill=self.modele.joueurs[i].couleur,
@@ -614,7 +614,8 @@ class VueCosmos(Vue):
         self.centrer_canvas(x,y)
 
     def centrer_sur_objet(self,objet)->None:
-        self.centrer_canvas(objet.x,objet.y)
+        #self.centrer_canvas(objet.x,objet.y)
+        self.centrer_canvas(*objet.position)
 
     def centrer_background(self,x,y):
         move_x = x - self.background_x
@@ -639,14 +640,14 @@ class VueCosmos(Vue):
         self.canvas_cosmos.xview_moveto(pctx)
         self.canvas_cosmos.yview_moveto(pcty)
 
-    def bouger_vaisseau(self,id:str,move_x:int,move_y:int):
-        self.canvas_cosmos.move(id,move_x,move_y)
+    def update_vaisseau(self, vaisseau: Vaisseau):
+        self.canvas_cosmos.moveto(vaisseau.id, *vaisseau.position)
 
     def afficher_decor(self): # TODO: faire un truc plus propre
 
         # affichage des etoiles
         for i in self.modele.etoiles:
-            self.canvas_cosmos.create_image(i.x, i.y,
+            self.canvas_cosmos.create_image(*i.position,
                 image=self.planete_image,
                 tags=(i.proprietaire, str(i.id), "Etoile",)
             )
@@ -655,21 +656,21 @@ class VueCosmos(Vue):
             for j in self.modele.joueurs[i].etoilescontrolees:
                 #si la planète/étoile affiché appartient à un AI
                 if(str(i)[0:2] == "IA"):
-                    self.canvas_cosmos.create_image(j.x,j.y,
+                    self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_ai_image,
                         tags=(j.proprietaire, str(j.id), "Etoile")
                     )
-                    self.canvas_cosmos.create_image(j.x,j.y,
+                    self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_orange_image,
                         tags=(j.proprietaire, str(j.id), "Etoile")
                     ) 
                 #si la planète/étoile affiché appartient à un Joueur
                 else:
-                    self.canvas_cosmos.create_image(j.x,j.y,
+                    self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_image,
                         tags=(j.proprietaire, str(j.id), "Etoile")
                     )
-                    self.canvas_cosmos.create_image(j.x,j.y,
+                    self.canvas_cosmos.create_image(*j.position,
                         image= self.planete_rouge_image,
                         tags=(j.proprietaire, str(j.id), "Etoile")
                     )

@@ -129,10 +129,10 @@ class Vecteur(complex):
         """
         if len(args) == 1:
             # Un seul argument, on le considère comme max_length
-            max_length = args[0]
+            min_length, max_length = 0, args[0]
         elif len(args) == 2:
             # Deux arguments, on les considère comme min_length et max_length
-            min_length, max_length= args
+            min_length, max_length = args
         elif len(args) > 2:
             raise TypeError("clamp() takes 1 or 2 positional arguments but 3 were given")
 

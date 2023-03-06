@@ -179,73 +179,76 @@ class GestionnairePartie(GestionnaireVue):
         self.root.resizable(False,False)
 
         self.controleur = controleur
+        self.modele = self.controleur.modele
         self.game_frame = tk.Frame(self.root)
 
         self.ma_selection = None
 
-        self.etatClic =  EtatClic.DEFAULT
+        self.etat_clic =  EtatClic.DEFAULT
 
-        self.vueCosmos = VueCosmos(self.root, self.game_frame,self.controleur.modele)
-        self.vueHUD = VueHUD(self.root, self.game_frame,self.controleur.modele)
+        self.vue_cosmos = VueCosmos(self.root, self.game_frame, self.modele)
+        self.vue_HUD = VueHUD(self.root, self.game_frame, self.modele)
         
-        self.root.geometry(f"{self.vueHUD.background_width}x{self.vueHUD.background_height}")
+        self.root.geometry(f"{self.vue_HUD.background_width}x{self.vue_HUD.background_height}")
+
+    def update_jeu(self):
+        """Mise à jour de la vue du jeu."""
+        for joueur in self.modele.joueurs.values():
+            for vaisseaumap in joueur.flotte.values():
+                for vaisseau in vaisseaumap.values():
+                    self.vue_cosmos.update_vaisseau(vaisseau)
+
 
     def bind_controls(self):
         #self.vueCosmos.canvas_cosmos.bind("<MouseWheel>", self.vueCosmos.do_zoom)
-        self.vueCosmos.canvas_cosmos.bind("<Button-1>", self.cosmos_clic)
-        self.vueHUD.minimap.bind("<Button-3>", self.vueHUD.cacher_mini)
-        self.vueHUD.minimap_button.bind("<Button-1>",self.vueHUD.montrer_mini)
-        self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
-        self.vueHUD.minimap.bind("<Button-1>", self.mini_clic)
+        self.vue_cosmos.canvas_cosmos.bind("<Button-1>", self.cosmos_clic)
+        self.vue_HUD.minimap.bind("<Button-3>", self.vue_HUD.cacher_mini)
+        self.vue_HUD.minimap_button.bind("<Button-1>",self.vue_HUD.montrer_mini)
+        self.vue_HUD.minimap.bind("<Button-1>", self.mini_clic)
+        self.vue_HUD.minimap.bind("<Button-1>", self.mini_clic)
 
-        self.vueHUD.bouton_combat.bind("<Button-1>", self.creer_vaisseau)
-        self.vueHUD.bouton_cargo.bind("<Button-1>", self.creer_vaisseau)
-        self.vueHUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
-        self.vueHUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
+        self.vue_HUD.bouton_combat.bind("<Button-1>", self.creer_vaisseau)
+        self.vue_HUD.bouton_cargo.bind("<Button-1>", self.creer_vaisseau)
+        self.vue_HUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
+        self.vue_HUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
         #self.vueHUD.bouton_batiment.bind("<Button-1>", self.construire_batiment)
 
     def bouger_vaisseau(self,e):
-        self.etatClic = EtatClic.BOUGER_VAISSEAU
-        v_select = self.controleur.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
-        self.depart_x = v_select.position.x
-        self.depart_y = v_select.position.y
-
-        
+        self.etat_clic = EtatClic.BOUGER_VAISSEAU
+        v_select = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
 
     def creer_vaisseau(self, evt):
         type_vaisseau = evt.widget.cget("text")
         self.controleur.creer_vaisseau(type_vaisseau)
-        self.vueCosmos.afficher_vaisseau()
+        self.vue_cosmos.afficher_vaisseau()
 
-    def cosmos_clic(self,e):
-        
-        if(self.etatClic == EtatClic.BOUGER_VAISSEAU):
-            v_select = self.controleur.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
+    def cosmos_clic(self, event: tk.Event):
+        if self.etat_clic == EtatClic.BOUGER_VAISSEAU:
+            v_select: Vaisseau = self.modele.joueurs[self.ma_selection[0]].flotte[self.ma_selection[2]][self.ma_selection[1]]
 
-            destination_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
-            destination_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
+            destination_x = self.vue_cosmos.canvas_cosmos.canvasx(event.x)
+            destination_y = self.vue_cosmos.canvas_cosmos.canvasy(event.y)
 
-            v_select.cible = Point(destination_x,destination_y)
+            v_select.cible = Point(destination_x, destination_y)
 
-            self.etatClic = EtatClic.DEFAULT
+            self.etat_clic = EtatClic.DEFAULT
 
+        elif self.etat_clic == EtatClic.DEFAULT: 
+            self.centre_ecran_canvas_x = self.vue_cosmos.canvas_cosmos.canvasx(event.x)
+            self.centre_ecran_canvas_y = self.vue_cosmos.canvas_cosmos.canvasy(event.y)
 
-        elif(self.etatClic == EtatClic.DEFAULT): 
-            self.centre_ecran_canvas_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
-            self.centre_ecran_canvas_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
+            self.vue_cosmos.centrer_canvas(self.centre_ecran_canvas_x ,self.centre_ecran_canvas_y )
 
-            self.vueCosmos.centrer_canvas(self.centre_ecran_canvas_x ,self.centre_ecran_canvas_y )
-
-            after_x = self.vueCosmos.canvas_cosmos.canvasx(e.x)
-            after_y = self.vueCosmos.canvas_cosmos.canvasy(e.y)
+            after_x = self.vue_cosmos.canvas_cosmos.canvasx(event.x)
+            after_y = self.vue_cosmos.canvas_cosmos.canvasy(event.y)
 
             move_x = after_x - self.centre_ecran_canvas_x 
             move_y = after_y - self.centre_ecran_canvas_y 
 
-            self.vueHUD.reposition_cursor(move_x,move_y)
+            self.vue_HUD.reposition_cursor(move_x,move_y)
             
             #self.vueHUD.reposition_cursor()
-            t = self.vueCosmos.canvas_cosmos.gettags(tk.CURRENT)
+            t = self.vue_cosmos.canvas_cosmos.gettags(tk.CURRENT)
             if t:  # il y a des tags
                 if t[0] == self.controleur.mon_nom:  # et
                     self.ma_selection = [self.controleur.mon_nom, t[1], t[2]]
@@ -260,36 +263,36 @@ class GestionnairePartie(GestionnaireVue):
                         #self.parent.cibler_flotte(self.ma_selection[1], t[1], t[2])
                         pass
                     self.ma_selection = None
-                    self.vueCosmos.canvas_cosmos.delete("marqueur")
+                    self.vue_cosmos.canvas_cosmos.delete("marqueur")
             else:  # aucun tag => rien sous la souris - sinon au minimum il y aurait CURRENT
                 print("Region inconnue")
                 self.ma_selection = None
-                self.vueCosmos.canvas_cosmos.delete("marqueur")
+                self.vue_cosmos.canvas_cosmos.delete("marqueur")
 
     def afficher_menu_planete(self, info_click: list):
-        for joueur in self.controleur.modele.joueurs.keys():
-            if self.controleur.modele.joueurs[joueur].nom == info_click[0]:
-                for planete in self.controleur.modele.joueurs[joueur].etoilescontrolees:
+        for joueur in self.modele.joueurs.keys():
+            if self.modele.joueurs[joueur].nom == info_click[0]:
+                for planete in self.modele.joueurs[joueur].etoilescontrolees:
                     if planete.id == info_click[1]:
                         planete_clique: Planete  = planete
             
-        self.vueHUD.afficher_menu_planete(planete_clique)
+        self.vue_HUD.afficher_menu_planete(planete_clique)
     
     def afficher_menu_vaisseau(self, info_click: list):
-        self.vueHUD.afficher_menu_vaisseau(self.controleur.modele.joueurs[info_click[0]].flotte[info_click[2]][info_click[1]])
+        self.vue_HUD.afficher_menu_vaisseau(self.modele.joueurs[info_click[0]].flotte[info_click[2]][info_click[1]])
 
 
     def mini_clic(self,e):
-        self.vueCosmos.mini_clic(e)
-        self.vueHUD.mini_clic(e)
+        self.vue_cosmos.mini_clic(e)
+        self.vue_HUD.mini_clic(e)
         
     def debuter(self):
-        self.vueCosmos.afficher_decor()
-        self.vueCosmos.afficher()
+        self.vue_cosmos.afficher_decor()
+        self.vue_cosmos.afficher()
 
-        self.vueHUD.afficher()
-        self.vueHUD.afficher_info_joueur(self.controleur.mon_nom)
-        self.vueHUD.afficher_mini_cosmos()
+        self.vue_HUD.afficher()
+        self.vue_HUD.afficher_info_joueur(self.controleur.mon_nom)
+        self.vue_HUD.afficher_mini_cosmos()
         self.bind_controls()
         #self.game_frame.mainloop()
 
