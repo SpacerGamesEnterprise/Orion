@@ -375,6 +375,30 @@ class VueHUD(Vue):
                 str(planete.max_inventaire["population"]), 
         )
 
+    def update_info_vaisseau(self, vaisseau: Vaisseau):
+        self.info_vaisseau.itemconfig(self.ressources_vaisseau,
+            text=" Metal: " + 
+                str(vaisseau.cargo["metal"]) +
+                "/" +
+                str(vaisseau.espace_cargo["metal"]) + 
+                "\n Bois: " +
+                str(vaisseau.cargo["bois"]) +
+                "/" +
+                str(vaisseau.espace_cargo["bois"]) + 
+                "\n Energie: " +
+                str(vaisseau.cargo["energie"]) +
+                "/" +
+                str(vaisseau.espace_cargo["energie"]) + 
+                "\n Nourriture: " +
+                str(vaisseau.cargo["nourriture"]) +
+                 "/" +
+                str(vaisseau.espace_cargo["nourriture"]) + 
+                "\n Population: " +
+                str(vaisseau.cargo["population"]) +
+                 "/" +
+                str(vaisseau.espace_cargo["population"]), 
+        )
+
     def load_menu_vaisseau(self):
 
         self.info_vaisseau = tk.Canvas(
@@ -407,6 +431,8 @@ class VueHUD(Vue):
     def afficher_menu_vaisseau(self, vaisseau: Vaisseau):
         self.cacher_menu_planete()
         self.bouton_bouger.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.update_info_vaisseau(vaisseau)
+        self.info_vaisseau.pack()
 
 
         

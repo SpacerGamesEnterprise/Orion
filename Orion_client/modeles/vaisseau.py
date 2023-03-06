@@ -13,6 +13,7 @@ class Vaisseau(ABC):
         self.id: int = get_prochain_id()
         self.proprietaire: str = nom
         self.position: Point = position
+        self.cargo: Ressources = Ressources()
         self.espace_cargo: Ressources = Ressources()
         self.taille: int = 5
         self.vitesse: int = 2
