@@ -17,7 +17,9 @@ class Planete():
             bois=random.randrange(1_000, 10_000_000),
             nourriture=random.randrange(1_000, 10_000_000)
         )
-        self.inventaire_ressources = Ressources()
+        self.inventaire_ressources = Ressources(
+            population=random.randrange(1, 50)
+        )
         self.max_inventaire = Ressources(
             metal=10_000,
             bois=10_000,

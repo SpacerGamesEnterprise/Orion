@@ -227,7 +227,9 @@ class GestionnairePartie(GestionnaireVue):
         self.vue_HUD.bouton_eclaireur.bind("<Button-1>", self.creer_vaisseau)
         self.vue_HUD.bouton_bouger.bind("<Button-1>",self.bouger_vaisseau)
         self.vue_HUD.bouton_conquerir.bind("<Button-1>",self.conquerir)
-        self.vue_HUD.bouton_batiment.bind("<Button-1>", self.afficher_menu_batiment)
+        self.vue_HUD.bouton_construction.bind("<Button-1>", self.afficher_menu_construction)
+        self.vue_HUD.info_planete.bind("<Button-1>", self.afficher_menu_batiments)
+        #Binding options de batiments a construire
         self.vue_HUD.bouton_defense.bind("<Button-1>", self.bind_batiment(Defense))
         self.vue_HUD.bouton_ferme.bind("<Button-1>", self.bind_batiment(Ferme))
         self.vue_HUD.bouton_centrale.bind("<Button-1>", self.bind_batiment(Centrale))
@@ -251,14 +253,17 @@ class GestionnairePartie(GestionnaireVue):
             ][0]
         else:
             return None
+    
+    def afficher_menu_batiments(self, e):
+        self.vue_HUD.afficher_menu_batiments()    
 
     def bind_batiment(self, type_batiment: type[Batiment]):
         def inner(*args, **kwargs):
             self.planete_select.ajouter_batiment(type_batiment())
         return inner
 
-    def afficher_menu_batiment(self, e):
-        self.vue_HUD.afficher_menu_batiments(self.planete_select)
+    def afficher_menu_construction(self, e):
+        self.vue_HUD.afficher_menu_construction(self.planete_select)
 
     def bouger_vaisseau(self,e):
         self.etat_clic = EtatClic.BOUGER_VAISSEAU

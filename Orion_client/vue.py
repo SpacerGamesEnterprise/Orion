@@ -294,9 +294,42 @@ class VueHUD(Vue):
 
         self.load_menu_planete()
         self.load_menu_vaisseau()
+        self.load_menu_construction()
         self.load_menu_batiment()
         
     def load_menu_batiment(self):
+        self.bouton_ameliorer = tk.Button(self.cadre_outils_h,
+            width= 10,height = 10,
+            text="Ameliorer",
+            font=('Helvetica 8 bold')
+        )
+        self.menu_hangar = tk.Canvas(
+            self.cadre_outils_h, 
+            width= int(self.cadre_h_width/2), 
+            height = int(self.cadre_h_height/2), 
+            bg="black"
+        )
+        
+        self.bouton_construire_cargo = tk.Button(self.menu_hangar,
+            text="Construire Cargo",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_construire_eclaireur = tk.Button(self.menu_hangar,
+            text="Construire Eclaireur",
+            font=('Helvetica 8 bold')
+        )
+        self.bouton_construire_combat = tk.Button(self.menu_hangar,
+            text="Construire Vaisseau de Combat",
+            font=('Helvetica 8 bold')
+        )
+    def afficher_menu_batiments(self):
+        self.cacher_menu_vaisseau()
+        self.cacher_menu_construction()
+        self.cacher_menu_planete()
+        self.bouton_ameliorer.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.menu_hangar.pack()
+    
+    def load_menu_construction(self):
         self.bouton_mine = tk.Button(self.cadre_outils_h,
             width= 10,height = 10,
             text="Mine",
@@ -339,7 +372,7 @@ class VueHUD(Vue):
         )
         
     def load_menu_planete(self):
-        self.bouton_batiment = tk.Button(self.cadre_outils_h,
+        self.bouton_construction = tk.Button(self.cadre_outils_h,
             width= 10,height = 10,
             text="Construire Batiment",
             font=('Helvetica 8 bold')
@@ -479,15 +512,15 @@ class VueHUD(Vue):
 
     def afficher_menu_planete(self, planete: Planete):
         self.cacher_menu_vaisseau()
-        self.cacher_menu_batiment()
-        self.bouton_batiment.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
+        self.cacher_menu_construction()
+        self.bouton_construction.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_eclaireur.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_cargo.place(relx=0.42, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_combat.place(relx=0.53, rely=0.1, relwidth=0.1, relheight=0.8)
         self.update_info_planete(planete)
         self.info_planete.pack()
         
-    def afficher_menu_batiments(self, planete: Planete):
+    def afficher_menu_construction(self, planete: Planete):
         self.cacher_menu_vaisseau()
         self.cacher_menu_planete()
         self.bouton_defense.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
@@ -504,20 +537,20 @@ class VueHUD(Vue):
 
     def afficher_menu_vaisseau(self, vaisseau: Vaisseau):
         self.cacher_menu_planete()
-        self.cacher_menu_batiment()
+        self.cacher_menu_construction()
         self.bouton_bouger.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_conquerir.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.update_info_vaisseau(vaisseau)
         self.info_vaisseau.pack()
 
     def cacher_menu_planete(self):
-        self.bouton_batiment.place_forget()
+        self.bouton_construction.place_forget()
         self.bouton_eclaireur.place_forget()
         self.bouton_cargo.place_forget()
         self.bouton_combat.place_forget()
         self.info_planete.pack_forget()
         
-    def cacher_menu_batiment(self):
+    def cacher_menu_construction(self):
         self.bouton_defense.place_forget()
         self.bouton_ferme.place_forget()
         self.bouton_centrale.place_forget()
