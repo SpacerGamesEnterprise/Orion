@@ -21,8 +21,8 @@ class Vaisseau(ABC):
         self.id: int = get_prochain_id()
         self.proprietaire: str = nom
         self.position: Point = position
-        self.cargo: Ressources = Ressources()
-        self.espace_cargo: Ressources = Ressources()
+        self.inventaire_ressources: Ressources = Ressources()
+        self.max_inventaire: Ressources = Ressources()
         self.taille: int = 5
         self.vitesse: int = 20
         self.nom_vaisseau: str = ""
@@ -45,11 +45,13 @@ class Vaisseau(ABC):
         """Retourne l'inventaire de la planète et augmente
         le niveau du vaissseau
         """
-        if inventaire_planete.has_more(2 * self.cout_construction):
+        if inventaire_planete >= (2 * self.cout_construction):
             self.cout_construction *= 2        
             inventaire_planete -= self.cout_construction
             self.niveau += 1
-        return inventaire_planete      
+        return inventaire_planete 
+    
+    
 
     def jouer_prochain_coup(self, trouver_nouveau=0):
         if self.cible is not None:
@@ -105,7 +107,7 @@ class Cargo(Vaisseau):
         super().__init__(nom, position)
         self.nom_vaisseau = "Cargo"
         self.cout_construction = Ressources(metal=1000, bois=500, energie=1500)
-        self.espace_cargo = Ressources(
+        self.max_inventaire = Ressources(
             metal=1000, 
             bois=1000,
             energie=50000,
@@ -121,7 +123,7 @@ class Eclaireur(Vaisseau):
         super().__init__(nom, position)
         self.nom_vaisseau = "Éclaireur"
         self.cout_construction = Ressources(metal=250, bois=150, energie=500)
-        self.espace_cargo = Ressources(
+        self.max_inventaire = Ressources(
             metal=150, 
             bois=150,
             energie=500,
@@ -137,7 +139,7 @@ class Combat(Vaisseau):
         super().__init__(nom, position)
         self.nom_vaisseau = "Combat"
         self.cout_construction = Ressources(metal=500, bois=100, energie=750)
-        self.espace_cargo = Ressources(
+        self.max_inventaire = Ressources(
             metal=200, 
             bois=200,
             energie=5000,

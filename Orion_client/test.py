@@ -1,3 +1,4 @@
+from orion_modele import Joueur
 from modeles.batiment import Ferme, Hangar, Mine
 from modeles.planete import Planete
 from modeles.position import Point
@@ -5,7 +6,7 @@ from modeles.ressources import Ressources
 from modeles.vaisseau import Eclaireur
 
 
-p1: Planete = Planete(10, 100000)
+p1: Planete = Planete(Point(1,1))
 
 b1: Hangar = Hangar()
 
@@ -39,12 +40,23 @@ p1.inventaire_ressources = b2.ameliorer(p1.inventaire_ressources)
 b3: Mine = Mine()
 
 p1.ajouter_batiment(b3)
-
-print(p1.inventaire_ressources)
-
+j1: Joueur = Joueur(b1,"joueur", p1, "VERT")
 p1.produire_ressources() 
 
 print(p1.inventaire_ressources)
+
+j1.flotte["Eclaireur"][v1.id] = v1
+
+j1.transferer_ressources((p1.id, "Planete"), (v1.id, "Eclaireur"), Ressources(metal=1000))
+print(p1.inventaire_ressources)
+print(v1.inventaire_ressources)
+j1.transferer_ressources((p1.id, "Planete"), (v1.id, "Eclaireur"), Ressources(metal=-1000, bois=1000))
+print(p1.inventaire_ressources)
+print(v1.inventaire_ressources)
+
+
+
+
 
 
 

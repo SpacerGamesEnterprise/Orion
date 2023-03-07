@@ -16,7 +16,7 @@ class Batiment(ABC):
      
     def ameliorer(self, inventaire_planete: Ressources) -> Ressources:
         """Retourne l'inventaire de la planete augmente le niveau du batiment"""
-        if inventaire_planete.has_more(self.cout_construction * (self.niveau + 1)):
+        if inventaire_planete >= (self.cout_construction * (self.niveau + 1)):
             inventaire_planete -= self.cout_construction
             self.niveau += 1
             self.quantites_production *= self.niveau
@@ -100,7 +100,7 @@ class Hangar(Batiment):
             liste_vaisseaux: list[Vaisseau]
     ) -> Ressources:
         """Retourne l'inventaire de la planete"""
-        if inventaire_planete.has_more(vaisseau.cout_construction):
+        if inventaire_planete >= (vaisseau.cout_construction):
             inventaire_planete -= vaisseau.cout_construction
             liste_vaisseaux.append(vaisseau)
         return inventaire_planete       

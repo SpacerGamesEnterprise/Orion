@@ -36,7 +36,7 @@ class Planete():
     def ajouter_batiment(self, batiment: Batiment) -> bool:
         """Retourne si un batiment est ajouté dans la liste de la planete"""
         if self.espace_batiment_dispo() \
-                and self.inventaire_ressources.has_more(batiment.cout_construction):
+                and self.inventaire_ressources >= (batiment.cout_construction):
             self.inventaire_ressources -= batiment.cout_construction
             self.batiments.append(batiment)
             return True

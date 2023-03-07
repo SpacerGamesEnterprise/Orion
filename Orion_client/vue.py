@@ -431,25 +431,25 @@ class VueHUD(Vue):
     def update_info_vaisseau(self, vaisseau: Vaisseau):
         self.info_vaisseau.itemconfig(self.ressources_vaisseau,
             text=" Metal: " + 
-                str(vaisseau.cargo["metal"]) +
+                str(vaisseau.inventaire_ressources["metal"]) +
                 "/" +
-                str(vaisseau.espace_cargo["metal"]) + 
+                str(vaisseau.max_inventaire["metal"]) + 
                 "\n Bois: " +
-                str(vaisseau.cargo["bois"]) +
+                str(vaisseau.inventaire_ressources["bois"]) +
                 "/" +
-                str(vaisseau.espace_cargo["bois"]) + 
+                str(vaisseau.max_inventaire["bois"]) + 
                 "\n Energie: " +
-                str(vaisseau.cargo["energie"]) +
+                str(vaisseau.inventaire_ressources["energie"]) +
                 "/" +
-                str(vaisseau.espace_cargo["energie"]) + 
+                str(vaisseau.max_inventaire["energie"]) + 
                 "\n Nourriture: " +
-                str(vaisseau.cargo["nourriture"]) +
+                str(vaisseau.inventaire_ressources["nourriture"]) +
                  "/" +
-                str(vaisseau.espace_cargo["nourriture"]) + 
+                str(vaisseau.max_inventaire["nourriture"]) + 
                 "\n Population: " +
-                str(vaisseau.cargo["population"]) +
+                str(vaisseau.inventaire_ressources["population"]) +
                  "/" +
-                str(vaisseau.espace_cargo["population"]), 
+                str(vaisseau.max_inventaire["population"]), 
         )
 
     def load_menu_vaisseau(self):

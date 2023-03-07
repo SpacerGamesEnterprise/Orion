@@ -48,7 +48,7 @@ class Ressources(dict):
                     ret[key] = value / scalar
             return ret
 
-    def has_more(self, other: Ressources) -> bool:
+    def __ge__(self, other: Ressources) -> bool:
         for key, value in other.items():
            if self[key] < value:
                return False

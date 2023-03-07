@@ -3,6 +3,8 @@
 
 import ast
 import random
+from modeles.ressources import Ressources
+from modeles.vaisseau import Vaisseau
 from modeles.position import Point
 from modeles.vaisseau import Cargo, Eclaireur, Combat
 from modeles.batiment import Usine
@@ -54,7 +56,28 @@ class Joueur():
         self.actions = {"ciblerflotte": self.ciblerflotte,
                         "creervaisseau": self.creervaisseau}
 
-    def creervaisseau(self, type_vaisseau): #TODO update hangar
+    def trouver_from_id(self, id: str, type_obj: str) -> Planete | Vaisseau:
+        if type_obj == "Planete":
+            for planete in self.planetes_controlees:
+                if planete.id == id:
+                    return planete
+            raise KeyError("No planet with specified ID could be found.")
+        elif type_obj == "Vaisseau":
+            for type_vaisseau in self.flotte:
+                try:
+                    vaisseau = self.trouver_from_id(id, type_vaisseau)
+                    return vaisseau
+                except KeyError:
+                    continue
+        elif type_obj in self.flotte:
+            return self.flotte[type_obj][id]
+        else:
+            raise TypeError(f"type_obj was unexpected: received {type_obj}")
+                        
+                    
+
+
+    def creervaisseau(self, type_vaisseau: str): #TODO update hangar
         type_vaisseau =  type_vaisseau[0]
         x, y = self.planete_mere.position
         position = Point(x + 10, y)
@@ -98,6 +121,23 @@ class Joueur():
 
     def jouer_prochain_coup(self):
         self.avancer_flotte()
+        
+    
+    def transferer_ressources(
+            self,
+            info_from: tuple[str, str],
+            info_to: tuple[str, str],
+            quantite_ressources: Ressources
+    ):
+        obj_from = self.trouver_from_id(*info_from)
+        obj_to = self.trouver_from_id(*info_to)
+        if obj_from.inventaire_ressources >= quantite_ressources:    
+            obj_from.inventaire_ressources -= quantite_ressources
+            obj_to.inventaire_ressources += quantite_ressources
+           
+            
+        
+        
 
     def avancer_flotte(self, chercher_nouveau=0):
         for i in self.flotte:
