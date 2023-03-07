@@ -295,6 +295,7 @@ class VueHUD(Vue):
         self.load_menu_planete()
         self.load_menu_vaisseau()
         self.load_menu_batiment()
+        self.load_menu_joueur()
         
     def load_menu_batiment(self):
         self.bouton_mine = tk.Button(self.cadre_outils_h,
@@ -378,7 +379,7 @@ class VueHUD(Vue):
             font=('Helvetica 10 bold'),
             fill="white"
         )
-
+        
         self.liste_batiments = self.info_planete.create_text(
             self.cadre_v_width/2, 
             self.cadre_v_height/5,
@@ -386,7 +387,38 @@ class VueHUD(Vue):
             fill="white"
         )
 
-
+    def load_menu_joueur(self):
+        self.planete_joueur = tk.Canvas(
+            self.cadre_outils_v, 
+            width= int(self.cadre_v_width), 
+            height = int(self.cadre_v_height/2), 
+            bg="black"
+        )
+        
+        self.vaisseau_joueur = tk.Canvas(
+            self.cadre_outils_v, 
+            width= int(self.cadre_v_width), 
+            height = int(self.cadre_v_height/2), 
+            bg="black"
+        )
+        
+        self.info_joueur_p = self.planete_joueur.create_text(
+            self.cadre_v_width/2, 
+            self.cadre_v_height/11,
+            font=('Helvetica 10 bold'),
+            fill="white"
+        )
+        
+    def update_menu_joueur(self, joueur: Joueur):
+        id = 1
+        string_planete: str = ""
+        for planete in joueur.planetes_controlees:
+            string_planete = string_planete  + "\n\t" + "Planète " + str(id) + " (" + str(planete.position.x) + ", " + str(planete.position.y) + ")"
+            id += 1
+        
+        self.planete_joueur.itemconfig(self.info_joueur_p,
+            text = "Planète : " + "\n" + string_planete)
+    
     def update_info_planete(self, planete: Planete):
         if not isinstance(planete, Planete):
             raise TypeError(f"Mauvais type envoye: {type(planete) = } ({planete = })")
@@ -480,6 +512,7 @@ class VueHUD(Vue):
     def afficher_menu_planete(self, planete: Planete):
         self.cacher_menu_vaisseau()
         self.cacher_menu_batiment()
+        self.cacher_menu_joueur()
         self.bouton_batiment.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_eclaireur.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_cargo.place(relx=0.42, rely=0.1, relwidth=0.1, relheight=0.8)
@@ -490,6 +523,7 @@ class VueHUD(Vue):
     def afficher_menu_batiments(self, planete: Planete):
         self.cacher_menu_vaisseau()
         self.cacher_menu_planete()
+        self.cacher_menu_joueur()
         self.bouton_defense.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_ferme.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_centrale.place(relx=0.42, rely=0.1, relwidth=0.1, relheight=0.8)
@@ -505,11 +539,20 @@ class VueHUD(Vue):
     def afficher_menu_vaisseau(self, vaisseau: Vaisseau):
         self.cacher_menu_planete()
         self.cacher_menu_batiment()
+        self.cacher_menu_joueur()
         self.bouton_bouger.place(relx=0.2, rely=0.1, relwidth=0.1, relheight=0.8)
         self.bouton_conquerir.place(relx=0.31, rely=0.1, relwidth=0.1, relheight=0.8)
         self.update_info_vaisseau(vaisseau)
         self.info_vaisseau.pack()
 
+    def afficher_menu_joueur(self, joueur:Joueur):
+        print("click")
+        self.cacher_menu_planete()
+        self.cacher_menu_batiment()
+        self.cacher_menu_vaisseau()
+        self.update_menu_joueur(joueur)
+        self.planete_joueur.pack()
+        
     def cacher_menu_planete(self):
         self.bouton_batiment.place_forget()
         self.bouton_eclaireur.place_forget()
@@ -533,6 +576,8 @@ class VueHUD(Vue):
         self.bouton_conquerir.place_forget()
         self.info_vaisseau.pack_forget()
 
+    def cacher_menu_joueur(self):
+        self.planete_joueur.pack_forget()
 
     def afficher_info_joueur(self, nom: str):
         self.nom = self.cadre_info.create_text(

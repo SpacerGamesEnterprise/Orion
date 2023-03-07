@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 import tkinter as tk
 
 from vue import Vue, VueSplash, VueLobby,VueCosmos,VueHUD
-from orion_modele import Modele, Point
+from orion_modele import Modele, Point, Joueur
 
 class EtatClic(Enum):
     DEFAULT = 0 
@@ -202,6 +202,8 @@ class GestionnairePartie(GestionnaireVue):
         self.vue_HUD = VueHUD(self.root, self.game_frame, self.modele)
         
         self.root.geometry(f"{self.vue_HUD.background_width}x{self.vue_HUD.background_height}")
+        
+        self.afficher_menu_joueur(self.modele.joueurs[self.controleur.mon_nom])
 
     def update_jeu(self):
         if self.ma_selection is not None:
@@ -305,6 +307,7 @@ class GestionnairePartie(GestionnaireVue):
             move_y = after_y - self.centre_ecran_canvas_y 
 
             self.vue_HUD.reposition_cursor(move_x,move_y)
+            self.afficher_menu_joueur(self.modele.joueurs[self.controleur.mon_nom])
             
             #self.vueHUD.reposition_cursor()
             t = self.vue_cosmos.canvas_cosmos.gettags(tk.CURRENT)
@@ -334,6 +337,8 @@ class GestionnairePartie(GestionnaireVue):
     def afficher_menu_vaisseau(self, info_click: list):
         self.vue_HUD.afficher_menu_vaisseau(self.modele.joueurs[info_click[0]].flotte[info_click[2]][info_click[1]])
 
+    def afficher_menu_joueur(self, joueur: Joueur):
+        self.vue_HUD.afficher_menu_joueur(joueur)
 
     def mini_clic(self,e):
         self.vue_cosmos.mini_clic(e)
