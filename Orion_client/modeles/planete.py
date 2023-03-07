@@ -44,7 +44,7 @@ class Planete():
     
     def produire_ressources(self):
         """Ajoute des ressources dans la plenete"""
-        for bati in self.batiments:
-            self.inventaire_ressources += bati.quantites_production
-        
-        
+        for batiment in self.batiments:
+            if self.inventaire_ressources >= batiment.cout_fonctionnement:
+                self.inventaire_ressources += batiment.quantites_production
+                self.inventaire_ressources -= batiment.cout_fonctionnement
