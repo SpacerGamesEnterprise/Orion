@@ -203,7 +203,7 @@ class GestionnairePartie(GestionnaireVue):
         self.ma_selection = None
 
         self.etat_clic =  EtatClic.DEFAULT
-        self.etat_menu = EtatClic.DEFAULT
+        self.etat_menu = EtatMenu.DEFAULT
 
         self.vue_cosmos = VueCosmos(self.root, self.game_frame, self.modele)
         self.vue_HUD = VueHUD(self.root, self.game_frame, self.modele)
@@ -284,10 +284,6 @@ class GestionnairePartie(GestionnaireVue):
                         self.modele.joueurs[self.ma_selection[0]].planetes_controlees.append(planete)
                         self.vue_cosmos.coloniser(planete,vaisseau_colonisateur)
         self.vue_HUD.afficher_mini_cosmos()
-
-
-        
-
 
     def creer_vaisseau(self, evt):
         type_vaisseau = evt.widget.cget("text")
