@@ -259,10 +259,7 @@ class VueHUD(Vue):
             width=self.minimap_size, height=self.minimap_size,                      
             bg="#000000",highlightbackground ="#a48dc2"
         )
-        self.minimap_background = self.minimap.create_image(
-            self.minimap_size/2,self.minimap_size/2,
-            image = self.minimap_background_img,
-        )
+        self.afficher_mini_background()
         self.minimap_cursor = self.minimap.create_rectangle(
             0,0,
             self.cursor_width,self.cursor_height,
@@ -539,8 +536,17 @@ class VueHUD(Vue):
             50, 20,
             text=nom, font=('Helvetica 10'),fill="white"
         )
+    
+    def afficher_mini_background(self):
+        self.minimap_background = self.minimap.create_image(
+            self.minimap_size/2,self.minimap_size/2,
+            image = self.minimap_background_img,
+        )
 
     def afficher_mini_cosmos(self):  # univers(self, mod):
+        self.minimap.delete(tk.ALL)
+        self.reposition_cursor(0,0) #reaffiche le curseur
+        self.afficher_mini_background()
         for j in self.modele.planetes:
             minix = j.position.x / self.modele.largeur * self.minimap_size
             miniy = j.position.y / self.modele.hauteur * self.minimap_size
@@ -607,12 +613,14 @@ class VueCosmos(Vue):
         self.planete_size_randomizer =random.randint(0,20)
 
         self.map_size = 9000#taille du canvas du cosmos
-        self.max_map_size = 2100
+        self.background_image_size = 2100
+        self.background_stars_image_size =4200
         self.min_map_size = 1500
         
         #variables pour effet de profondeur
         self.background_x = self.background_width/2
         self.background_y = self.background_height/2
+
         self.zoom = 3
 
         self.load_images()
@@ -624,8 +632,12 @@ class VueCosmos(Vue):
         )
         
         self.background = self.canvas_cosmos.create_image(
-            self.max_map_size/2,self.max_map_size/2,
+            self.background_image_size/2,self.background_image_size/2,
             image = self.background_image
+        )
+        self.background_stars = self.canvas_cosmos.create_image(
+            self.background_stars_image_size/2,self.background_stars_image_size/2,
+            image = self.background_stars_image
         )
         
         self.scrollX = tk.Scrollbar(self.main_frame, orient=tk.HORIZONTAL)
@@ -654,7 +666,11 @@ class VueCosmos(Vue):
        
         self.background_image = img_resize(
             getimg("gameBackground.png"),
-            (self.max_map_size,self.max_map_size)
+            (self.background_image_size,self.background_image_size)
+        )
+        self.background_stars_image = img_resize(
+            getimg("starsGameBackground.png"),
+            (self.background_stars_image_size,self.background_stars_image_size)
         )
         self.cargo_image = img_resize(
             getimg("image_vaisseau", "Cargo.png"),
@@ -698,7 +714,7 @@ class VueCosmos(Vue):
         factor = 1.001 ** e.delta
         self.map_size = self.map_size * factor
         zoom_valide=False
-        if(self.map_size>self.max_map_size):self.map_size=self.max_map_size
+        if(self.map_size>self.background_image_size):self.map_size=self.background_image_size
         elif(self.map_size<self.min_map_size):self.map_size=self.min_map_size
         else: zoom_valide = True
             
@@ -721,11 +737,23 @@ class VueCosmos(Vue):
         move_x = x - self.background_x
         move_y = y - self.background_y
           
-        move_background_x = (move_x /(self.map_size-self.background_width))*(self.map_size - self.max_map_size)
-        move_background_y = (move_y /(self.map_size-self.background_height))*(self.map_size - self.max_map_size)
-        
-        self.canvas_cosmos.move(self.background, move_background_x , move_background_y)
-        self.background_x = x
+        move_background_x = (move_x /(self.map_size-self.background_width))*(self.map_size - self.background_image_size)
+        move_background_y = (move_y /(self.map_size-self.background_height))*(self.map_size - self.background_image_size)
+
+        move_background_stars_x = (move_x /(self.map_size-self.background_width))*(self.map_size - self.background_stars_image_size)
+        move_background_stars_y = (move_y /(self.map_size-self.background_height))*(self.map_size - self.background_stars_image_size)
+
+        self.canvas_cosmos.move(
+            self.background,
+            move_background_x , move_background_y
+        )
+
+        self.canvas_cosmos.move(
+            self.background_stars,
+            move_background_stars_x,move_background_stars_y
+        )
+
+        self.background_x = x 
         self.background_y = y
     
     def centrer_canvas(self,x,y):
@@ -741,7 +769,29 @@ class VueCosmos(Vue):
         self.canvas_cosmos.yview_moveto(pcty)
 
     def update_vaisseau(self, vaisseau: Vaisseau):
-        self.canvas_cosmos.moveto(vaisseau.id, *vaisseau.position)
+        self.canvas_cosmos.moveto(
+            vaisseau.id,
+            vaisseau.position.x,vaisseau.position.y
+        )
+
+    def refresh_vaisseau(self,vaisseau: Vaisseau):
+        tailleF = vaisseau.taille * 2
+        self.canvas_cosmos.delete(str(vaisseau.id))
+        if isinstance(vaisseau,Combat):
+            self.canvas_cosmos.create_image((vaisseau.position.x - tailleF), (vaisseau.position.y - tailleF),
+                image= self.vaisseau_image,
+                tags=(vaisseau.proprietaire, str(vaisseau.id), "Combat", "Vaisseau")
+            )
+        if isinstance(vaisseau,Cargo):
+            self.canvas_cosmos.create_image((vaisseau.position.x - tailleF), (vaisseau.position.y - tailleF),
+                image= self.cargo_image,
+                tags=(vaisseau.proprietaire, str(vaisseau.id), "Cargo", "Vaisseau")
+            )
+        if isinstance(vaisseau,Eclaireur):
+            self.canvas_cosmos.create_image((j.position.x - tailleF), (vaisseau.position.y - tailleF),
+                image= self.vaisseau_image,
+                tags=(vaisseau.proprietaire, str(j.id), "Eclaireur", "Vaisseau")
+            )  
 
     def afficher_decor(self): # TODO: faire un truc plus propre
     
@@ -778,12 +828,13 @@ class VueCosmos(Vue):
                         tags=(j.proprietaire, str(j.id), "Planete")
                     )
 
-    def coloniser(self, planete):
+    def coloniser(self, planete,vaisseau):
         size_randomizer =random.randint(0,self.n_planet_variation)
         self.canvas_cosmos.create_image(*planete.position,
                         image= self.planete_rouge_image[size_randomizer],
                         tags=(planete.proprietaire, str(planete.id), "Planete")
                     )
+        self.refresh_vaisseau(vaisseau)
 
     def afficher_vaisseau(self):
         for i in self.modele.joueurs.keys():
