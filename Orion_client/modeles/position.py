@@ -127,14 +127,15 @@ class Vecteur(complex):
         """Retourne un nouveau vecteur avec une norme limitée entre
         les valeurs spécifiées.
         """
-        if len(args) == 1:
+        arglen = len(args)
+        if arglen == 1:
             # Un seul argument, on le considère comme max_length
             min_length, max_length = 0, args[0]
-        elif len(args) == 2:
+        elif arglen == 2:
             # Deux arguments, on les considère comme min_length et max_length
             min_length, max_length = args
-        elif len(args) > 2:
-            raise TypeError("clamp() takes 1 or 2 positional arguments but 3 were given")
+        elif arglen > 2:
+            raise TypeError(f"clamp() takes 1 or 2 positional arguments but {arglen} were given")
 
         if not args:
             min_length = kwargs.get("min_length", 0)
